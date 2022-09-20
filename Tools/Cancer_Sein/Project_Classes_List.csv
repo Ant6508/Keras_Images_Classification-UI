@@ -1,0 +1,3 @@
+Id,Class_Name,Images_Ctn,Val_Split,Path
+0,cancer,0,0.3,D:\\TIPE\\dicom\\tipe\\final\\data\\cancer
+1,normal,0,0.3,D:\\TIPE\\dicom\\tipe\\final\\data\\normal
