@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import simpledialog
 import tkinter.ttk as ttk
+import numpy as np
 
 import Data_From_Dir_manager
 import Keras_Model_Manager
@@ -21,9 +22,14 @@ class Application(tk.Tk):
     def __init__(self):
 
         tk.Tk.__init__(self)
+
+        self.Project_Dir = ""
+        self.Current_Csv = pandas.DataFrame({'A' : []})
+
         self.create_menu_bar()
         self.Create_Csv_reader()
         self.Create_Reader_Buttons()
+        self.Create_Import_Button()
 
 
 #Widgets creations
@@ -44,7 +50,6 @@ class Application(tk.Tk):
 
         self.config(menu=menu_bar) 
 
-
     def Create_Reader_Buttons(self):
 
         self.add_button_image = tk.PhotoImage(file=File_Manager_Tool.get_active_dir() + r"\\images\\add_button.png")
@@ -52,10 +57,9 @@ class Application(tk.Tk):
         rounded_add_button.place(x=355,y=25)
 
         self.del_button_image = tk.PhotoImage(file=File_Manager_Tool.get_active_dir() + r"\\images\\del.png")
-        rounded_del_button = tk.Button(self, image=self.del_button_image)
+        rounded_del_button = tk.Button(self, image=self.del_button_image,command=self.Del_Class)
         rounded_del_button.place(x=400,y=25)
 
-  
     def Create_Csv_reader(self):
 
         csv_frame = tk.Frame(self,bg="white",width=350,height=400)  
@@ -82,6 +86,10 @@ class Application(tk.Tk):
 
         self.tree.configure(yscroll=scrollbar.set)
         self.tree.grid(sticky='nsew')
+
+    def Create_Import_Button(self):
+        Import_Button = tk.Button(self,text="Import Images",width = 16,command = lambda : Data_From_Dir_manager.Import_Classes_Images(self.Current_Csv, self.Project_Dir + "/Data"))
+        Import_Button.place(x=25,y=255)
 
 #aux fonctions creations
 
@@ -125,8 +133,22 @@ class Application(tk.Tk):
 
         self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, img_ctn, Val_Split, class_path]
         self.Current_Csv.to_csv(self.Project_Dir + "/Project_Classes.csv",index=False)
-        print(self.Current_Csv,class_path,class_name,img_ctn)
         self.Load_Csv_File(File_Path= self.Project_Dir + "/Project_Classes.csv")
+
+    def Del_Class(self):
+        Selected_Class_Id = self.tree.focus()
+        Selected_Class_Id = int(self.tree.item(Selected_Class_Id)["values"][0])
+        print(Selected_Class_Id)
+
+        for i in range(Selected_Class_Id+1,len(self.Current_Csv)):
+            self.Current_Csv.loc[i] =np.concatenate( ([i-1] , (self.Current_Csv.loc[i])[1:]) ) 
+
+        self.Current_Csv.drop (self.Current_Csv.index[Selected_Class_Id], inplace=True)
+
+        self.Current_Csv.to_csv(self.Project_Dir + "/Project_Classes.csv",index=False)
+        self.Load_Csv_File(File_Path= self.Project_Dir + "/Project_Classes.csv")
+
+
 
 if __name__ == "__main__":
     app = Application()

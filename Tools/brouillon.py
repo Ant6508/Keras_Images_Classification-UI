@@ -1,6 +1,2 @@
-import pandas
-
-d= pandas.read_csv("test.csv")
-
-a = d.loc[1, :].values.tolist()
-print(a)
+f = lambda x,y : 2*x + y
+print(f(4,1))
