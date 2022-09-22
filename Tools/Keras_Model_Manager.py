@@ -1,6 +1,7 @@
 #imports
 
 import tensorflow as tf 
+from tensorflow import keras
 import pandas
 import numpy as np
 from tensorflow.keras import layers
@@ -9,13 +10,13 @@ from tensorflow.keras import layers
 
 def Load_Keras_Model(Model_Path):
 	model = tensorflow.keras.models.load_model(Model_Path)
-	return models
+	return model
 
 def Save_Keras_Model(Model,Model_Path):
 	Model.save(Model_Path)
 
 
-def Load_Premade():
+def Load_Premade(Size,Classes_Count):
 	model = tf.keras.Sequential([
     	layers.experimental.preprocessing.Rescaling(1.255),
     	layers.Conv2D(128,2,activation = "relu"),
@@ -33,7 +34,6 @@ def Load_Premade():
 
 	return model
 
-
 def Compile_Model(Model,optimizer = 'adam'):
 	Model.compile(optimizer = optimizer,
                 loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -41,10 +41,12 @@ def Compile_Model(Model,optimizer = 'adam'):
 
 def Fit_Model(Model,Train_Data,Val_Data,Epochs=3):
  
-	Model.fit( 
+	hist = Model.fit( 
 	    Train_Data,
 	  validation_data=Val_Data,
 	  epochs=Epochs)
+
+	return hist.history['accuracy']
 
 
 def Get_Args_Names(Function):
@@ -52,7 +54,6 @@ def Get_Args_Names(Function):
 
 def Get_Args_Count(Function):
 	return Function.__code__.co_argcount
-
 
 
 def Match_Layer(layer,Arg_List):
@@ -70,10 +71,6 @@ def Match_Layer(layer,Arg_List):
 
 		layer += ")"
 	return eval(layer)
-
-
-Match_Layer("Conv2D",[32,3,"activation = 'relu'"])
-
 
 def Create_Model(Layers_List,Options_List):
 

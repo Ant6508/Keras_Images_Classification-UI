@@ -6,6 +6,7 @@ import os
 import shutil
 import glob
 import File_Manager_Tool
+from tkinter import messagebox
 
 
 
@@ -66,20 +67,28 @@ def Import_Classes_Images(Classes_df,Data_dir): # Classes_df is the csv file con
 			Train_Images_Count = len(Images_List)    
 
 			for image in Images_List:
-				shutil.copy2(Train_Images_Path + "/" + image , Data_dir + r"/Training/"+ Class_name + "/" + image)  #moves each images to prepare it right for the IA
+
+				try :
+
+					shutil.copy2(Train_Images_Path + "/" + image , Data_dir + r"/Training/"+ Class_name + "/" + image)  #moves each images to prepare it right for the IA
+				except  :
+
+					pass
+
 
 			Images_List = os.listdir(Val_Images_Path)
 			Val_Images_Count = len(Images_List)  
 
 			for image in Images_List:
-				shutil.copy2(Val_Images_Path + "/" + image , Data_dir + r"/Validation/"+ Class_name+ "/" + image )
+				shutil.copy2(Val_Images_Path + "/" + image , Data_dir + r"/Validation/"+ Class_name + "/" + image)
 
-			#Classes_df.loc[i,"Val_Split"] = Val_Images_Count / (Train_Images_Count + Val_Images_Count)
+			messagebox.showinfo("Information","Your classed were successfully imported")
 
 		else :
 
 			Create_Subsets(Path,Classes_df,i)
 			Import_Classes_Images(Classes_df,Data_dir)
+
 
 def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
 

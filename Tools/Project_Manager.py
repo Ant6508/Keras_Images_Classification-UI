@@ -19,6 +19,7 @@ def Create_Project(Project_Name,Project_Dir):
 	os.mkdir(Project_Dir+"/Data/Validation")
 
 	shutil.copy2(File_Manager_Tool.get_active_dir() + '/Tools/Classes_Setup.csv', Project_Dir+"/Project_Classes.csv")
+	
 
 	Load_Project(Project_Dir)
 
