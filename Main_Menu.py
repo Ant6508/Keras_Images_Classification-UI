@@ -1,5 +1,14 @@
+import os
+
+
+def get_active_dir():
+    path = os.getcwd()
+    path = path.replace("\\","/")
+    return path
+
+
 import sys
-sys.path.insert(1, 'D:/Projets_info/Class_Auto/Tools')
+sys.path.insert(1, get_active_dir() + '/Tools')
 
 import tkinter as tk
 from tkinter import *
@@ -17,7 +26,6 @@ import Req_Manager
 
 from tensorflow import keras
 import pandas
-import os
 
 
 
@@ -218,7 +226,7 @@ class Application(tk.Tk):
 
         Project_Name = simpledialog.askstring("Save trained model","Enter the model Name")
 
-        self.Current_Model.save(self.Project_Dir + '/Ia_Models')
+        self.Current_Model.save(self.Project_Dir + '/Ia_Models/' + Project_Name)
 
 
 if __name__ == "__main__":
