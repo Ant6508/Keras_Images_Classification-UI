@@ -1,6 +1,5 @@
-tkinter
+tk
 numpy
 tensorflow
 pandas
-glob
 shutil
