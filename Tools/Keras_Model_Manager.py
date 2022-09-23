@@ -18,7 +18,7 @@ def Save_Keras_Model(Model,Model_Path):
 
 def Load_Premade(Size,Classes_Count):
 	model = tf.keras.Sequential([
-    	layers.experimental.preprocessing.Rescaling(1.255),
+    	layers.experimental.preprocessing.Rescaling(1.255,input_shape = (Size,Size,1)),
     	layers.Conv2D(128,2,activation = "relu"),
     	layers.MaxPooling2D(),
     	layers.Conv2D(64,2,activation = "relu"),
@@ -33,6 +33,9 @@ def Load_Premade(Size,Classes_Count):
 		])
 
 	return model
+
+p = Load_Premade(400,4)
+p.save("model")
 
 def Compile_Model(Model,optimizer = 'adam'):
 	Model.compile(optimizer = optimizer,

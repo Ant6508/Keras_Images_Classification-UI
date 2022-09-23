@@ -23,8 +23,6 @@ import Project_Manager
 import Req_Manager
 
 import Classes_Importer
-import Model_Manager
-import Results_Viewer
 
 from tensorflow import keras
 import pandas
@@ -41,20 +39,16 @@ class Application(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-
-        for F in (  Classes_Importer.C_I_win , Model_Manager.M_M_win , Results_Viewer.R_win ):
-
+        for F in (Classes_Importer.win , Classes_Importer.win):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
 
             frame.grid(row=0, column=0, sticky="nsew")
 
+        self.show_frame("win")
 
-
-        self.show_frame("M_M_win")
         self.create_menu_bar()
-        self.Create_Nav_Bar()
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -90,28 +84,22 @@ class Application(tk.Tk):
         self.Project_Dir = Project_Dir +"/"+Project_Name
         self.Load_Csv_File(File_Path = self.Project_Dir + "/Project_Classes.csv")
 
+
     def Load_Project(self):
 
         self.Project_Dir = filedialog.askdirectory(title="Where is your project directory?")
         self.Load_Csv_File(File_Path = self.Project_Dir + "/Project_Classes.csv")
 
-    def Create_Nav_Bar(self):
-
-        button1 = ttk.Button(self,text="Import Classes",width = 22,command = lambda : self.show_frame(page_name="C_I_win") )
-        button1.place(x=0,y=0)
-
-        button2 = ttk.Button(self,text="Manage Model",width = 22,command = lambda : self.show_frame(page_name="M_M_win") )
-        button2.place(x=146,y=0)
-
-        button3 = ttk.Button(self,text="See Results",width = 22,command = lambda : self.show_frame(page_name="R_win") )
-        button3.place(x=293,y=0)
 
 
 
+
+
+       
 
 if __name__ == "__main__":
     app = Application()
     app.title("Py_Auto_Class")
-    app.geometry("440x350")
+    app.geometry("900x325")
     app.resizable(width=False, height=False)
     app.mainloop()
