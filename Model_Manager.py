@@ -21,12 +21,12 @@ import Keras_Model_Manager
 import File_Manager_Tool
 import Project_Manager
 import Req_Manager
-
+import Results_Viewer
 import Classes_Importer
 
 from tensorflow import keras
 import pandas
-
+import time
 
 
 
@@ -40,6 +40,7 @@ class M_M_win(tk.Frame):
 
         self.Create_Model_Viewer()
         self.Create_Model_Buttons()
+        self.test= "test"
 
 
     def Create_Model_Viewer(self):
@@ -54,13 +55,13 @@ class M_M_win(tk.Frame):
         self.tree_model = ttk.Treeview(self.Model_frame, columns=columns, show='headings')
 
         self.tree_model.heading('Id', text='Id')
-        self.tree_model.column("Id", minwidth=0, width=50, stretch=NO)
+        self.tree_model.column("Id", minwidth=0, width=20, stretch=NO)
 
         self.tree_model.heading('Layer_Name', text='Layer Name')
         self.tree_model.column("Layer_Name", minwidth=0, width=100, stretch=NO)
 
         self.tree_model.heading('Parameters', text='Parameters')
-        self.tree_model.column("Parameters", minwidth=0, width=100, stretch=NO)
+        self.tree_model.column("Parameters", minwidth=0, width=130, stretch=NO)
 
         scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree_model.yview)
         scrollbar.place(x=275,y=50,height=225)
@@ -71,35 +72,18 @@ class M_M_win(tk.Frame):
 
     def Create_Model_Buttons(self):
         Load_Model_Button = tk.Button(self,text="Import a model",command=self.Load_Model)
-        Load_Model_Button.place(x=300,y=50)
-
-        Fit_Model_Button = tk.Button(self,text="Fit the model",fg="red",command=self.Fit_Model)
-        Fit_Model_Button.place(x=300,y=95)
-
+        Load_Model_Button.place(x=320,y=50)
 
 #model functions
     def Load_Model(self):
 
-        self.Current_Model_Path = filedialog.askdirectory(title="Select the model")
+        self.Model_Path = filedialog.askdirectory(title="Select the model")
 
-        self.Current_Model = keras.models.load_model(self.Current_Model_Path)
+        self.controller.shared_data["Current_Model"] = keras.models.load_model(self.Model_Path)
 
-        for i in range(len(self.Current_Model.layers)):
-            layer = self.Current_Model.layers[i]
+        for i in range(len(self.controller.shared_data["Current_Model"].layers)):
+            layer = self.controller.shared_data["Current_Model"].layers[i]
             line =  [i,layer.name,"parametres non dispo"]
 
             self.tree_model.insert('', tk.END, values=line)
 
-    def Fit_Model(self):
-
-
-        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.Project_Dir,size=400,batch_size=5,Seed=None)
-        Keras_Model_Manager.Compile_Model(self.Current_Model)
-
-        acc = Keras_Model_Manager.Fit_Model(self.Current_Model,Train_Data,Val_Data)
-        messagebox.showinfo("Information","Your model was successfully trained\nwith the data you provided\nwith an accuracy of {a} %".format(a=round(acc[-1],3)*100 ))
-
-        Project_Name = simpledialog.askstring("Save trained model","Enter the model Name")
-
-        if Project_Name != None:
-            self.Current_Model.save(self.Project_Dir + '/Ia_Models/' + Project_Name)

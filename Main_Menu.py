@@ -33,26 +33,28 @@ import pandas
 class Application(tk.Tk):
 
     def __init__(self, *args, **kwargs):
+
         tk.Tk.__init__(self, *args, **kwargs)
 
-        container = tk.Frame(self)
+        container = tk.Frame(self)  #stacked frames containers
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+
+        self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None}   #shared project data other forms can access
+
         self.frames = {}
 
-        for F in (  Classes_Importer.C_I_win , Model_Manager.M_M_win , Results_Viewer.R_win ):
+        for F in (  Classes_Importer.C_I_win , Model_Manager.M_M_win , Results_Viewer.R_win):  # forms declaration
 
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
-
             frame.grid(row=0, column=0, sticky="nsew")
 
 
-
-        self.show_frame("M_M_win")
+        self.show_frame("C_I_win")
         self.create_menu_bar()
         self.Create_Nav_Bar()
 
@@ -82,18 +84,18 @@ class Application(tk.Tk):
     def Setup_Project(self):
 
         Project_Dir = filedialog.askdirectory(title="Where should the project be created ?")
-
         Project_Name = simpledialog.askstring("Enter The Project Name","Enter The Project Name")
+
+        self.shared_data["Project_Dir"] = f"{Project_Dir}/{Project_Name}"
 
         Project_Manager.Create_Project(Project_Name,Project_Dir)
 
-        self.Project_Dir = Project_Dir +"/"+Project_Name
-        self.Load_Csv_File(File_Path = self.Project_Dir + "/Project_Classes.csv")
+        Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"], File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv")
 
     def Load_Project(self):
 
-        self.Project_Dir = filedialog.askdirectory(title="Where is your project directory?")
-        self.Load_Csv_File(File_Path = self.Project_Dir + "/Project_Classes.csv")
+        self.shared_data["Project_Dir"] = filedialog.askdirectory(title="Where is your project directory?")
+        Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"] ,File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv")
 
     def Create_Nav_Bar(self):
 
@@ -106,12 +108,9 @@ class Application(tk.Tk):
         button3 = ttk.Button(self,text="See Results",width = 22,command = lambda : self.show_frame(page_name="R_win") )
         button3.place(x=293,y=0)
 
-
-
-
 if __name__ == "__main__":
     app = Application()
     app.title("Py_Auto_Class")
-    app.geometry("440x350")
+    app.geometry("440x325")
     app.resizable(width=False, height=False)
     app.mainloop()

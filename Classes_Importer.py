@@ -16,6 +16,7 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 import numpy as np
 
+import Main_Menu
 import Data_From_Dir_manager
 import Keras_Model_Manager
 import File_Manager_Tool
@@ -29,9 +30,6 @@ import pandas
 
 
 
-
-
-
 class C_I_win(tk.Frame):
 
     def __init__(self,parent,controller):
@@ -39,8 +37,8 @@ class C_I_win(tk.Frame):
         tk.Frame.__init__(self,parent)
         self.controller = controller
 
-        self.Project_Dir = ""
         self.Current_Csv = pandas.DataFrame({'A' : []})
+  
 
         self.Create_Csv_reader()
         self.Create_Reader_Buttons()
@@ -87,8 +85,8 @@ class C_I_win(tk.Frame):
         self.tree_csv.grid(sticky='nsew')
 
     def Create_Import_Button(self):
-        Import_Button = tk.Button(self,text="Import Images",width = 16,command = lambda : Data_From_Dir_manager.Import_Classes_Images(self.Current_Csv, self.Project_Dir + "/Data"))
-        Import_Button.place(x=25,y=530)
+        Import_Button = tk.Button(self,text="Import Images",width = 16,command = lambda : Data_From_Dir_manager.Import_Classes_Images(self.Current_Csv, self.controller.shared_data["Project_Dir"] + "/Data"))
+        Import_Button.place(x=25,y=280)
 
 
 #aux fonctions creations
@@ -118,22 +116,22 @@ class C_I_win(tk.Frame):
         img_ctn = 0
         for root, dirs, files in os.walk(class_path):
             img_ctn += len(files)
-
+            
         self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, img_ctn, Val_Split, class_path]
-        self.Current_Csv.to_csv(self.Project_Dir + "/Project_Classes.csv",index=False)
-        self.Load_Csv_File(File_Path= self.Project_Dir + "/Project_Classes.csv")
+        self.Current_Csv.to_csv(self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv",index=False)
+        self.Load_Csv_File(File_Path= self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv")
+
 
     def Del_Class(self):
         Selected_Class_Id = self.tree_csv.focus()
         Selected_Class_Id = int(self.tree_csv.item(Selected_Class_Id)["values"][0])
-        print(Selected_Class_Id)
-
+ 
         for i in range(Selected_Class_Id+1,len(self.Current_Csv)):
             self.Current_Csv.loc[i] =np.concatenate( ([i-1] , (self.Current_Csv.loc[i])[1:]) ) 
 
         self.Current_Csv.drop (self.Current_Csv.index[Selected_Class_Id], inplace=True)
 
-        self.Current_Csv.to_csv(self.Project_Dir + "/Project_Classes.csv",index=False)
-        self.Load_Csv_File(File_Path= self.Project_Dir + "/Project_Classes.csv")
+        self.Current_Csv.to_csv(self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv",index=False)
+        self.Load_Csv_File(File_Path= self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv")
 
 

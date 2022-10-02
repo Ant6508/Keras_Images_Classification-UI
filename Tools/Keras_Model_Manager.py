@@ -1,3 +1,5 @@
+
+
 #imports
 
 import tensorflow as tf 
@@ -42,12 +44,14 @@ def Compile_Model(Model,optimizer = 'adam'):
                 loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
                 metrics=['accuracy'])
 
-def Fit_Model(Model,Train_Data,Val_Data,Epochs=3):
+def Fit_Model(Model,Train_Data,Val_Data,Custom_Call_Object,Epochs=3):
  
 	hist = Model.fit( 
 	    Train_Data,
 	  validation_data=Val_Data,
-	  epochs=Epochs)
+	  epochs=Epochs,
+	  verbose=0,
+	  callbacks=[Custom_Call_Object])
 
 	return hist.history['accuracy']
 
