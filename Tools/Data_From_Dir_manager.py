@@ -94,14 +94,14 @@ def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
 
 	Data_dir= Project_Dir + "/Data"
 
-	Train_Data = tf.keras.preprocessing.image_dataset_from_directory(
+	Train_Data = tf.keras.utils.image_dataset_from_directory(
 		Data_dir+"/Training",
 		seed=Seed,
 		color_mode='grayscale',
 		image_size= (size,size) ,
 		batch_size = batch_size)
 
-	Val_Data = tf.keras.preprocessing.image_dataset_from_directory(
+	Val_Data = tf.keras.utils.image_dataset_from_directory(
 		Data_dir+"/Validation",
 		seed=Seed,
 		color_mode='grayscale',

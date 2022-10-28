@@ -72,9 +72,9 @@ def Match_Layer(layer,Arg_List):
 
 		layer += "(" + str(Arg_List[0])
 
-		for i in range(1,len(Arg_List)):
+		for arg in Arg_List[1:] :
 
-			layer += "," + str(Arg_List[i])
+			layer += "," + str(arg)
 
 		layer += ")"
 	return eval(layer)
@@ -88,3 +88,5 @@ def Create_Model(Layers_List,Options_List):
 		Model.add(layer)
 
 	return Model
+
+

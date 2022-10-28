@@ -42,7 +42,7 @@ class Application(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
 
-        self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None}   #shared project data other forms can access
+        self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None , "Classes_num" : 0}   #shared project data other forms can access
 
         self.frames = {}
 
