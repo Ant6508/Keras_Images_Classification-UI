@@ -117,6 +117,7 @@ class C_I_win(tk.Frame):
         for root, dirs, files in os.walk(class_path):
             img_ctn += len(files)
             
+
         self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, img_ctn, Val_Split, class_path]
         self.Current_Csv.to_csv(self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv",index=False)
         self.Load_Csv_File(File_Path= self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv")

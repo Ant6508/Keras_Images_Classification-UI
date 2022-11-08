@@ -84,8 +84,9 @@ class R_win(tk.Frame):
 
     def Start_Fitting(self):
 
-        t1=Thread(target=self.Display_Results)
-        t1.start()
+        print(self.controller.shared_data["Current_Model"].summary())
+        self.t1=Thread(target=self.Display_Results)
+        self.t1.start()
 
         t2=Thread(target=self.Fit_Model)
         t2.start()
@@ -102,6 +103,8 @@ class R_win(tk.Frame):
 
             self.Txt_Box.see(END)
             time.sleep(1)
+            boo = self.t1.is_alive()
+
 
 
 
