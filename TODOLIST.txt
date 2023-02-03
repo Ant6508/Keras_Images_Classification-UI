@@ -1,0 +1,4 @@
+-interface pour volume dicom
+-data augmentation
+-generateur de schémas pour représenter le réseau de neurones
+-parametres pour l'utilisateur (taille de l'image, coef pour val data

@@ -71,15 +71,13 @@ class R_win(tk.Frame):
             Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
 
-            acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback())
-
+            acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback()) #fit the model
 
             messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
 
             Model_Name = simpledialog.askstring("Save trained model","Enter the model Name")
 
-            if Project_Name != None:
-                self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
+            self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
 
 
     def Start_Fitting(self):

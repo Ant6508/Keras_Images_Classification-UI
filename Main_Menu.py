@@ -1,20 +1,28 @@
+"""
+Created by : Rongere Julien
+Date : Sepctember 2022
+Goal : this file initialize the app itself 
+"""
+
+
+
+#imports
+
 import os
 
-def get_active_dir():
+def get_active_dir(): #function that returns the active directory the app was lunch from
     path = os.getcwd()
     path = path.replace("\\","/")
     return path
 
 import sys
-sys.path.insert(1, get_active_dir() + '/Tools')
+sys.path.insert(1, get_active_dir() + '/Tools') #adds the tools folder to the path
 
 import tkinter as tk
-from tkinter import *
 from tkinter import filedialog
 from tkinter import simpledialog
-import tkinter.ttk as ttk
 from tkinter import messagebox
-import numpy as np
+import tkinter.ttk as ttk
 
 import Data_From_Dir_manager
 import Keras_Model_Manager
@@ -28,6 +36,7 @@ import Results_Viewer
 
 from tensorflow import keras
 import pandas
+import numpy as np
 
 
 class Application(tk.Tk):
@@ -36,13 +45,13 @@ class Application(tk.Tk):
 
         tk.Tk.__init__(self, *args, **kwargs)
 
-        container = tk.Frame(self)  #stacked frames containers
+        container = tk.Frame(self)  #stacked frames container
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
 
-        self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None , "Classes_num" : 0}   #shared project data other forms can access
+        self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None , "Classes_num" : 0 ,"paramters":{"size":400}}   #shared project data other forms can access
 
         self.frames = {}
 
@@ -63,7 +72,18 @@ class Application(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def create_menu_bar(self):
+    def Create_Nav_Bar(self): #creates the navigation bar
+
+        button1 = ttk.Button(self,text="Import Classes",width = 22,command = lambda : self.show_frame(page_name="C_I_win") )
+        button1.place(x=0,y=0)
+
+        button2 = ttk.Button(self,text="Manage Model",width = 22,command = lambda : self.show_frame(page_name="M_M_win") )
+        button2.place(x=146,y=0)
+
+        button3 = ttk.Button(self,text="See Results",width = 22,command = lambda : self.show_frame(page_name="R_win") )
+        button3.place(x=293,y=0)
+
+    def create_menu_bar(self): #creates the menu bar
         menu_bar = tk.Menu(self)
 
         menu_file = tk.Menu(menu_bar, tearoff=0)
@@ -82,6 +102,7 @@ class Application(tk.Tk):
 
 #Project menu bar functions
     def Setup_Project(self):
+        #function that creates the project
 
         Project_Dir = filedialog.askdirectory(title="Where should the project be created ?")
         Project_Name = simpledialog.askstring("Enter The Project Name","Enter The Project Name")
@@ -93,20 +114,12 @@ class Application(tk.Tk):
         Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"], File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv")
 
     def Load_Project(self):
-
-        self.shared_data["Project_Dir"] = filedialog.askdirectory(title="Where is your project directory?")
+        #function that loads the project
+        ans = self.shared_data["Project_Dir"] = filedialog.askdirectory(title="Where is your project directory?")
+        if ans == "": #if the user cancels the operation
+            return
         Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"] ,File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv")
-
-    def Create_Nav_Bar(self):
-
-        button1 = ttk.Button(self,text="Import Classes",width = 22,command = lambda : self.show_frame(page_name="C_I_win") )
-        button1.place(x=0,y=0)
-
-        button2 = ttk.Button(self,text="Manage Model",width = 22,command = lambda : self.show_frame(page_name="M_M_win") )
-        button2.place(x=146,y=0)
-
-        button3 = ttk.Button(self,text="See Results",width = 22,command = lambda : self.show_frame(page_name="R_win") )
-        button3.place(x=293,y=0)
+    
 
 if __name__ == "__main__":
     app = Application()
