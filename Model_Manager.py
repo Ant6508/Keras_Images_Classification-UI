@@ -41,9 +41,14 @@ class M_M_win(tk.Frame):
         tk.Frame.__init__(self,parent)
         self.controller = controller #referes to the main app
 
+        self.name = "Model Manager"
+
         self.Create_Model_Viewer()
         self.Create_Model_Buttons()
         self.keras_layers_list = sorted([layer for layer in keras.layers.__dict__.keys() if inspect.isclass(eval(f"layers.{layer}"))]) # keras layers functions
+
+        self.tree_model.bind("<Up>",lambda event:self.swap_layers(event))
+        self.tree_model.bind("<Down>",lambda event:self.swap_layers(event))
 
 #widgets creation
     def Create_Model_Viewer(self):
@@ -368,31 +373,30 @@ class M_M_win(tk.Frame):
             item = self.tree_model.item(self.tree_model.selection())["values"][0]
             self.tree_model.set(0,i,i-1)
 
-    def swap_layers(self):
+    def swap_layers(self,event):
         model = self.controller.shared_data["Current_Model"]
-        i,j = self.tree_model.item(self.tree_model.selection())["values"][0] - 1, self.tree_model.item(self.tree_model.selection())["values"][0]
+        if event.keysym == "Up":
+            dx=-1 #represents the direction of the swap
+        elif event.keysym == "Down":
+            dx=1
+        i,j = self.tree_model.item(self.tree_model.selection())["values"][0] +dx, self.tree_model.item(self.tree_model.selection())["values"][0]
         layer_i, layer_j = model.layers[i], model.layers[j]
 
         new_model = keras.Sequential(model.layers[:i]) #we create a new model with the first layers to add
 
-        input_shape = (None, new_model.output_shape[-1]) #we change its input shape to the output_shape of the last layer
-        layer_j.build(input_shape=input_shape)
-        new_model.add(layer_j)
-        input_shape = (None, new_model.output_shape[-1]) #we change its input shape to the output_shape of the last layer
-        layer_i.build(input_shape=input_shape)
-        new_model.add(layer_i)
-
-        for layer in model.layers[j+1:]:
-            input_shape = (None, new_model.output_shape[-1])
-            layer.build(input_shape=input_shape)
-            new_model.add(layer)
+        for layer in [layer_j,layer_i] + model.layers[j+1:]: #the swap operates here by adding the layers in the wrong order and adding the right ones after
+            input_shape = (None, new_model.output_shape[-1]) #we change its input shape to the output_shape of the last layer
+            layer.build(input_shape=input_shape) #we build the layer with the new input shape
+            new_model.add(layer)     
 
         self.controller.shared_data["Current_Model"] = new_model
 
         self.tree_model.delete(self.tree_model.selection())
-        self.tree_model.insert('', tk.END, values=[i+1,layer_i.name,"parametres non dispo"])
-        self.tree_model.insert('', tk.END, values=[j+1,layer_j.name,"parametres non dispo"])
+        self.tree_model.insert('', i, values=[i,layer_j.name,"parametres non dispo"])
+        self.tree_model.insert('', j, values=[j,layer_i.name,"parametres non dispo"])
+    
 
+        print([layer.name for layer in self.controller.shared_data["Current_Model"].layers])
         
         
 

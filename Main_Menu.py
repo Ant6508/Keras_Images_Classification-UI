@@ -32,6 +32,7 @@ import Req_Manager
 
 import Classes_Importer
 import Model_Manager
+import Prediction
 import Results_Viewer
 
 from tensorflow import keras
@@ -45,17 +46,13 @@ class Application(tk.Tk):
 
         tk.Tk.__init__(self, *args, **kwargs)
 
-        container = tk.Frame(self)  #stacked frames container
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
+        container = self.frames_notebook = ttk.Notebook(self)
 
         self.shared_data = {"Project_Dir" : "" ,  "Current_Model" : None , "Classes_num" : 0 ,"paramters":{"size":400}}   #shared project data other forms can access
 
         self.frames = {}
 
-        for F in (  Classes_Importer.C_I_win , Model_Manager.M_M_win , Results_Viewer.R_win):  # forms declaration
+        for F in (  Classes_Importer.C_I_win , Model_Manager.M_M_win , Results_Viewer.R_win,Prediction.Prediction_win):  # forms declaration
 
             page_name = F.__name__
             frame = F(parent=container, controller=self)
@@ -72,16 +69,17 @@ class Application(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def Create_Nav_Bar(self): #creates the navigation bar
+    def Create_Nav_Bar(self):
+        #creates the navigation bar which allows to switch between the different forms
 
-        button1 = ttk.Button(self,text="Import Classes",width = 22,command = lambda : self.show_frame(page_name="C_I_win") )
-        button1.place(x=0,y=0)
+        
+        self.frames_notebook.pack(side="top", fill="both", expand=True)
 
-        button2 = ttk.Button(self,text="Manage Model",width = 22,command = lambda : self.show_frame(page_name="M_M_win") )
-        button2.place(x=146,y=0)
+        for frame in self.frames.values():
+            name = frame.name
 
-        button3 = ttk.Button(self,text="See Results",width = 22,command = lambda : self.show_frame(page_name="R_win") )
-        button3.place(x=293,y=0)
+            self.frames_notebook.add(frame, text=name)
+
 
     def create_menu_bar(self): #creates the menu bar
         menu_bar = tk.Menu(self)
@@ -124,6 +122,6 @@ class Application(tk.Tk):
 if __name__ == "__main__":
     app = Application()
     app.title("Py_Auto_Class")
-    app.geometry("440x325")
+    app.geometry("440x350")
     app.resizable(width=False, height=False)
     app.mainloop()

@@ -47,6 +47,8 @@ class C_I_win(tk.Frame):
         tk.Frame.__init__(self,parent)
         self.controller = controller  #referes to the main window
 
+        self.name = "Classes_Importer" #name of the window
+
         self.Current_Csv = pandas.DataFrame({'A' : []}) # csv where the different classes are stored
         self.progress_bar = None
   

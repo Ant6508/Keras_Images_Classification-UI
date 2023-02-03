@@ -10,16 +10,13 @@ sys.path.insert(1, get_active_dir() + '/Tools')
 
 import tkinter as tk
 from tkinter import *
-from tkinter import filedialog
 from tkinter import simpledialog
-import tkinter.ttk as ttk
 from tkinter import messagebox
 
 from tensorflow import keras
-import threading
 from threading import Thread
-import pandas
 import time
+import shutil
 
 import Data_From_Dir_manager
 import Keras_Model_Manager
@@ -33,9 +30,9 @@ class R_win(tk.Frame):
 
     def __init__(self,parent,controller):
         tk.Frame.__init__(self,parent)
-
         self.controller = controller
-        print(parent,self.controller)
+
+        self.name = "Fit"
 
         self.Create_Text_Box()
         self.Create_Buttons()
@@ -65,6 +62,8 @@ class R_win(tk.Frame):
 #aux fonctions creations
 
     def Fit_Model(self):
+        # Fits the model while displaying the accuracy to the user
+        #also saves the model in the project directory as well as the log file
 
 
             Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],size=400,batch_size=3,Seed=None)
@@ -76,8 +75,11 @@ class R_win(tk.Frame):
             messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
 
             Model_Name = simpledialog.askstring("Save trained model","Enter the model Name")
+            if Model_Name == None:
+                Model_Name = "My_Model"
 
             self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
+            shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "_log.txt")
 
 
     def Start_Fitting(self):
@@ -102,8 +104,6 @@ class R_win(tk.Frame):
             self.Txt_Box.see(END)
             time.sleep(1)
             boo = self.t1.is_alive()
-
-
 
 
 
@@ -136,6 +136,10 @@ class CustomCallback(keras.callbacks.Callback):
         self.Add_2_Log(f"After batch {batch} , accuracy: {acc}, loss: {loss}\n")
 
     def Add_2_Log(self,text):
+        #add the text to log
+
+
+        path = self.controller.shared_data["Project_Dir"] + "/temp_log.txt"
 
         with open("temp_log.txt","a") as txt:
 
