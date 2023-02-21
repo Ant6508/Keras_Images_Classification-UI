@@ -87,6 +87,10 @@ class R_win(tk.Frame):
 
     def Start_Fitting(self):
 
+        with open("temp_log.txt","w") as txt: #clear the log file
+            txt.write("")
+
+
         self.t1=Thread(target=self.Display_Results)
         self.t1.start()
 
@@ -105,12 +109,14 @@ class R_win(tk.Frame):
 
             self.Txt_Box.see(END)
             time.sleep(1)
-            boo = self.t1.is_alive() 
+            boo = self.t2.is_alive() #boolean repreeenting if the fitting thread is still alive
 
         return
 
 
 class CustomCallback(keras.callbacks.Callback):
+    #custom callback to display the results of the training
+    #also saves the results in a log file
 
 
     def on_train_begin(self, logs=None):

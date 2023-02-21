@@ -24,7 +24,7 @@ import Tools.Req_Manager as Req_Manager
 import Model_Manager
 
 from tensorflow import keras
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image,ImageOps
 
 #------------Imports end------------
 class Prediction_win(tk.Frame):
@@ -67,20 +67,28 @@ class Prediction_win(tk.Frame):
 
         image_path = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
         self.image = Image.open(image_path)
+        self.image = ImageOps.grayscale(self.image) #convert the image to grayscale
         resized_image = self.image.resize((250,250),  Image.ANTIALIAS)
         self.image_object = ImageTk.PhotoImage(resized_image)
         self.image_label = tk.Label(self.image_reader,image = self.image_object)
         self.image_label.place(x=0,y=0)
+
+        self.y_class_label.config(text = "Predicted Class : \n")
+        self.y_pred_label.config(text = "Probability : \n")
+        
 
     def Predict(self):
         #this function predicts the class of the image and displays the result 
 
         model = self.controller.shared_data["Current_Model"]
 
-        self.image = self.image.resize(model.input_shape[1:3],  Image.ANTIALIAS)
-        photoimage = ImageTk.PhotoImage(self.image)
+        self.image = self.image.resize((model.input_shape[1],model.input_shape[2]),  Image.ANTIALIAS) #resize the image to the input shape of the model
+    
+        modified_image = np.array(self.image)
+        modified_image = np.expand_dims(modified_image, axis=0) #add a dimension to the image to make it a batch of 1 image
 
-        y_pred = model.predict(self.image)
+
+        y_pred = model.predict(modified_image).round(2)
         y_class = np.argmax(y_pred,axis=1)
 
         self.y_pred_label.config(text = "Probability : \n" + str(y_pred))

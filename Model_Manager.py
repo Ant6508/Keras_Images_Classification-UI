@@ -181,7 +181,7 @@ class M_M_win(tk.Frame):
         self.arg_list = [] #list which contains the parameters of the selected layer
 
         #disabling the main window
-        self.add_child_win.grab_set()
+        self.mod_child_win.grab_set()
         
 
         if self.tree_model.selection() == (): #if no layer is selected

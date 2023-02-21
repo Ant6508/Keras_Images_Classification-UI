@@ -116,13 +116,14 @@ class Application(tk.Tk):
 
     def Load_Project(self):
         #function that loads the project
-        
+
         ans = self.shared_data["Project_Dir"] = filedialog.askdirectory(title="Where is your project directory?")
         if ans == "": #if the user cancels the operation
             return
         try:
-            Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"] ,File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv")
-            self.shared_data["Classes_num"] = len(Classes_Importer.C_I_win.Classes)
+            File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv"
+            Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"] ,File_Path = File_Path)
+            self.shared_data["Classes_num"] = len(pandas.read_csv(File_Path).index)
         except FileNotFoundError:
             messagebox.showerror("Error","The project is not valid")
             return

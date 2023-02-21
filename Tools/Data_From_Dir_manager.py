@@ -147,5 +147,24 @@ def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
 
 def sort_folder(folder_path,model):
 	#function which sorts the images in a folder according to the keras model given in parameter
+	#the images are sorted in subfolders with the name of the class predicted by the model
 
-	pass
+	Images_List = os.listdir(folder_path) # gets the list of images in the training subset
+	Images_List = [ fname for fname in Images_List if fname.endswith(".jpg")]
+
+	Classes = model.predict_classes(Images_List) # predicts the classes of the images
+
+	# creates the folders
+	for i in range(len(Classes)):
+		try :
+			os.mkdir(folder_path + "/" + Classes[i])
+		except FileExistsError : #if it already exists, it means some images were already given for this class
+			pass
+
+	# moves the images to the correct folder
+	for i in range(len(Classes)):
+		try :
+			shutil.move(folder_path + "/" + Images_List[i],folder_path + "/" + Classes[i] + "/" + Images_List[i])
+		except shutil.Error : #if it already exists, it means some images were already given for this class
+			pass
+		
