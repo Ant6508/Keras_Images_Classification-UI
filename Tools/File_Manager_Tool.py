@@ -39,9 +39,7 @@ def get_args_dict(fn, args, kwargs):
 
 def count_files_in_dir(dir):
     #function that counts the number of files in a directory
-
-    return len([name for name in os.listdir(dir)
-            if os.path.isfile(os.path.join(dir, name))])
+    return len(os.listdir(dir))
 
 def to_string(value):
     if isinstance(value, str):

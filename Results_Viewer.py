@@ -64,47 +64,50 @@ class R_win(tk.Frame):
     def Fit_Model(self):
         # Fits the model while displaying the accuracy to the user
         #also saves the model in the project directory as well as the log file
+  
+        if self.controller.shared_data["Current_Model"] == None or self.controller.shared_data["Current_Model"].built == False:
+            messagebox.showerror("Error","You need to create and train a model first")
+            return
+
+        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],size=400,batch_size=3,Seed=None)
+        Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
 
-            Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],size=400,batch_size=3,Seed=None)
-            Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
+        acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback()) #fit the model
 
+        messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
 
-            acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback()) #fit the model
+        Model_Name = simpledialog.askstring("Save trained model","Enter the model Name")
+        if Model_Name == None:
+            Model_Name = "My_Model"
 
-            messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
-
-            Model_Name = simpledialog.askstring("Save trained model","Enter the model Name")
-            if Model_Name == None:
-                Model_Name = "My_Model"
-
-            self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
-            shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "_log.txt")
+        self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
+        shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "_log.txt")
 
 
     def Start_Fitting(self):
 
-        print(self.controller.shared_data["Current_Model"].summary())
         self.t1=Thread(target=self.Display_Results)
         self.t1.start()
 
-        t2=Thread(target=self.Fit_Model)
-        t2.start()
+        self.t2=Thread(target=self.Fit_Model)
+        self.t2.start()
 
     def Display_Results(self):
 
-        boo = True
+        boo = True #boolean to check if the thread is still alive
         while boo:
             self.Txt_Box.delete(1.0,END)
             with open("temp_log.txt",'r') as txt : 
 
                 for line in txt.readlines():
-                    self.Txt_Box.insert("end",line)
+                    self.Txt_Box.insert("end",line)    
 
             self.Txt_Box.see(END)
             time.sleep(1)
-            boo = self.t1.is_alive()
+            boo = self.t1.is_alive() 
 
+        return
 
 
 class CustomCallback(keras.callbacks.Callback):
@@ -136,10 +139,7 @@ class CustomCallback(keras.callbacks.Callback):
         self.Add_2_Log(f"After batch {batch} , accuracy: {acc}, loss: {loss}\n")
 
     def Add_2_Log(self,text):
-        #add the text to log
-
-
-        path = self.controller.shared_data["Project_Dir"] + "/temp_log.txt"
+        #add the text to log file
 
         with open("temp_log.txt","a") as txt:
 

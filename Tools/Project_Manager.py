@@ -4,10 +4,11 @@ import pandas
 import os
 import shutil
 import glob
-import File_Manager_Tool
+import Tools.File_Manager_Tool as File_Manager_Tool
 
 
 def Create_Project(Project_Name,Project_Dir):
+	#Creates the project folder and the subfolders needed for the project
 
 	os.mkdir(Project_Dir+"/"+Project_Name)
 	Project_Dir = Project_Dir+"/"+Project_Name

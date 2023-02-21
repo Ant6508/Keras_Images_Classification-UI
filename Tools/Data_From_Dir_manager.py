@@ -5,7 +5,7 @@ import pandas
 import os
 import shutil
 import glob
-import File_Manager_Tool
+import Tools.File_Manager_Tool as File_Manager_Tool
 from tkinter import messagebox
 import tkinter as tk
 
@@ -33,8 +33,13 @@ def Create_Subsets(Path,Classes_df,i):
 		os.rename(Path +"/" +image  , Path + "/Training/" + image )
 
 
+def Import_Classes_Images(parent,Classes_df,Data_dir):
+	# Imports the images of the classes in the project folder
+	# Classes_df is the csv file containing the Classes to import , data_dir the global data folder of the projet where all the other Classes are located
 
-def Import_Classes_Images(parent,Classes_df,Data_dir): # Classes_df is the csv file containing the Classes to import , data_dir the global data folder of the projet where all the other Classes are located
+	if parent.controller.shared_data["Project_Dir"] == "" :
+		messagebox.showerror("Error","Please create a project first")
+		return
 
 	Nbr_Classes = len(Classes_df)
 	
@@ -140,4 +145,7 @@ def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
 	return Train_Data,Val_Data
 
 
-	
+def sort_folder(folder_path,model):
+	#function which sorts the images in a folder according to the keras model given in parameter
+
+	pass

@@ -3,34 +3,23 @@ Created by : Rongere Julien
 Date : Sepctember 2022
 Goal : this file creates the classes importer window which deals with the user data importation
 """
+#------------Imports begin------------
 
-
-
-import os
-
-def get_active_dir():
-    path = os.getcwd()
-    path = path.replace("\\","/")
-    return path
-
-import sys
-sys.path.insert(1, get_active_dir() + '/Tools')
-
+#GUI imports
 import tkinter as tk
-from tkinter import *
 from tkinter import filedialog
 from tkinter import simpledialog
 import tkinter.ttk as ttk
 from tkinter import messagebox
+
 import numpy as np
 
 import Main_Menu
-import Data_From_Dir_manager
-import Keras_Model_Manager
-import File_Manager_Tool
-import Project_Manager
-import Req_Manager
-
+import Tools.Data_From_Dir_manager as Data_From_Dir_manager
+import Tools.Keras_Model_Manager as Keras_Model_Manager
+import Tools.File_Manager_Tool as File_Manager_Tool
+import Tools.Project_Manager as Project_Manager
+import Tools.Req_Manager as Req_Manager
 import Model_Manager
 
 from tensorflow import keras
@@ -38,7 +27,7 @@ import pandas
 import shutil
 import threading
 
-
+#------------Imports end------------
 
 class C_I_win(tk.Frame):
 
@@ -84,16 +73,16 @@ class C_I_win(tk.Frame):
         self.tree_csv = ttk.Treeview(csv_frame, columns=columns, show='headings')
 
         self.tree_csv.heading('Id', text='Id')
-        self.tree_csv.column("Id", minwidth=0, width=50, stretch=NO)
+        self.tree_csv.column("Id", minwidth=0, width=50, stretch=tk.NO)
 
         self.tree_csv.heading('Class_Name', text='Class Name')
-        self.tree_csv.column("Class_Name", minwidth=0, width=100, stretch=NO)
+        self.tree_csv.column("Class_Name", minwidth=0, width=100, stretch=tk.NO)
 
         self.tree_csv.heading('Images_Ctn', text='Image total Count')
-        self.tree_csv.column("Images_Ctn", minwidth=0, width=100, stretch=NO)
+        self.tree_csv.column("Images_Ctn", minwidth=0, width=100, stretch=tk.NO)
 
         self.tree_csv.heading('Val_Split', text='Val Split')
-        self.tree_csv.column("Val_Split", minwidth=0, width=50, stretch=NO)
+        self.tree_csv.column("Val_Split", minwidth=0, width=50, stretch=tk.NO)
 
         #scrollbar
         scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree_csv.yview)
@@ -146,12 +135,19 @@ class C_I_win(tk.Frame):
     def Add_Class(self,Val_Split = 0.2):
         #this function adds a class to the project csv
 
+        if self.controller.shared_data["Project_Dir"] == None:
+            messagebox.showinfo("Error", "You must create a project first")
+            return
+
         class_path = filedialog.askdirectory(title="Where is your class directory?")
+        if class_path == "":
+            return
         class_name= class_path.split("/")[-1] #the class name corresponds to the folder's name 
 
         img_ctn = File_Manager_Tool.count_files_in_dir(class_path)
+        print(img_ctn)
             
-        self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, img_ctn, Val_Split, class_path]
+        self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, str(img_ctn), Val_Split, class_path]
         self.Current_Csv.to_csv(self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv",index=False)
         self.Load_Csv_File(File_Path= self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv")
 
@@ -161,6 +157,9 @@ class C_I_win(tk.Frame):
         #this function removes the selected class from the csv and removes from the project directory
 
         Selected_Class_Id = self.tree_csv.focus() #get the selected row
+        if Selected_Class_Id == "":
+            messagebox.showinfo("Error", "You must select a class first")
+            return
         Selected_Class_Id = int(self.tree_csv.item(Selected_Class_Id)["values"][0])  #get the id of the selected row
  
         for i in range(Selected_Class_Id+1,len(self.Current_Csv)):
@@ -174,11 +173,8 @@ class C_I_win(tk.Frame):
         self.controller.shared_data["Classes_num"] -=1
 
         #remove the class from the project directory
-        shutil.rmtree(self.controller.shared_data["Project_Dir"] + "/Data/" + self.Current_Csv.loc[Selected_Class_Id,"Class_Name"])
+        try:
 
-
-    def import_classes(self):
-        #this function will import the classes if they were not already imported
-        #as well as displaying the user informations about the current importation
-
-        pass
+            shutil.rmtree(self.controller.shared_data["Project_Dir"] + "/Data/" + self.Current_Csv.loc[Selected_Class_Id,"Class_Name"])
+        except:
+            pass
