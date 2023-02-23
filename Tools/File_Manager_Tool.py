@@ -38,8 +38,14 @@ def get_args_dict(fn, args, kwargs):
     return {**dict(zip(args_names, args)), **kwargs}
 
 def count_files_in_dir(dir):
-    #function that counts the number of files in a directory
-    return len(os.listdir(dir))
+    #function that counts the number of files in a directory and its subdirectories
+    
+    nbr_files = 0
+    for path, dirs, files in os.walk(dir):
+        for f in files:
+            nbr_files += 1
+
+    return nbr_files
 
 def to_string(value):
     if isinstance(value, str):

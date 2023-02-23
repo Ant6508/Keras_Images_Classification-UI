@@ -142,7 +142,8 @@ class C_I_win(tk.Frame):
         class_path = filedialog.askdirectory(title="Where is your class directory?")
         if class_path == "":
             return
-        class_name= class_path.split("/")[-1] #the class name corresponds to the folder's name 
+        class_name= class_path.split("/")[-1] #the class name corresponds to the folder's name
+        print(class_name)
 
         img_ctn = File_Manager_Tool.count_files_in_dir(class_path)
         print(img_ctn)
