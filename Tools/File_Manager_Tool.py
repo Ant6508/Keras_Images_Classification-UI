@@ -59,3 +59,9 @@ def create_thread(target, args=()):
     thread = threading.Thread(target=target, args=args)
     thread.start()
     return thread
+
+def Open_Directory(path):
+    #function that opens a directory in the file explorer
+    
+    path = path.replace("/","\\")
+    os.startfile(path)

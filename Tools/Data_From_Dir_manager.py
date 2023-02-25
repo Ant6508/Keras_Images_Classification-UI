@@ -1,14 +1,14 @@
 #imports
 
 import tensorflow as tf
-import pandas
+import numpy as np
 import os
 import shutil
 import glob
 import Tools.File_Manager_Tool as File_Manager_Tool
 from tkinter import messagebox
 import tkinter as tk
-
+from keras.preprocessing import image
 
 
 #Aux functions
@@ -122,7 +122,7 @@ def check_subsets(Classes_df):
 
 	
 
-def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
+def Create_Classes_Data(Project_Dir,batch_size=32,Seed=None):
 	#function which creates and returns the training and validation data from the classes in the project dir
 	#the data is returned as a tf.data.Dataset object which can be used to train the model
 
@@ -132,14 +132,12 @@ def Create_Classes_Data(Project_Dir,size=400,batch_size=32,Seed=None):
 		Data_dir+"/Training",
 		seed=Seed,
 		color_mode='grayscale',
-		image_size= (size,size) ,
 		batch_size = batch_size)
 
 	Val_Data = tf.keras.utils.image_dataset_from_directory(
 		Data_dir+"/Validation",
 		seed=Seed,
 		color_mode='grayscale',
-		image_size= (size,size) ,
 		batch_size = batch_size)
 
 	return Train_Data,Val_Data
@@ -152,19 +150,21 @@ def sort_folder(folder_path,model):
 	Images_List = os.listdir(folder_path) # gets the list of images in the training subset
 	Images_List = [ fname for fname in Images_List if fname.endswith(".jpg")]
 
-	Classes = model.predict_classes(Images_List) # predicts the classes of the images
+	classes_count = model.output_shape[1] # gets the number of classes in the model
 
-	# creates the folders
-	for i in range(len(Classes)):
-		try :
-			os.mkdir(folder_path + "/" + Classes[i])
-		except FileExistsError : #if it already exists, it means some images were already given for this class
+	for i in range(classes_count):
+		try:
+			os.mkdir(folder_path + "/" + model.output_names[i]) # creates the subfolders for each class
+		except FileExistsError:
 			pass
 
-	# moves the images to the correct folder
-	for i in range(len(Classes)):
-		try :
-			shutil.move(folder_path + "/" + Images_List[i],folder_path + "/" + Classes[i] + "/" + Images_List[i])
-		except shutil.Error : #if it already exists, it means some images were already given for this class
-			pass
-		
+
+	for image in Images_List:
+
+		img = image.load_img(folder_path + "/" + image, color_mode='grayscale', target_size=(400, 400))
+		img = image.img_to_array(img)
+		img = np.expand_dims(img, axis=0)
+
+		prediction = np.argmax(model.predict(img)) # gets the class predicted by the model
+
+		shutil.move(folder_path + "/" + image , folder_path + "/" + model.output_names[prediction] + "/" + image) # moves the image to the right folder

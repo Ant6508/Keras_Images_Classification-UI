@@ -113,6 +113,13 @@ class C_I_win(tk.Frame):
         self.progress_bar["maximum"] = maximum
         self.progress_bar["value"] = 0
 
+    def Create_Open_Data_Button(self):
+        #this function creates the button that allows the user to open the project data directory
+
+        Open_Data_Button = tk.Button(self,text="Open Data Directory",width = 16,
+                                    command = self.Open_Data_Directory)
+        Open_Data_Button.place(x=100,y=280)
+
 #auxiliary fonctions
 #project functions
 
@@ -131,6 +138,16 @@ class C_I_win(tk.Frame):
         for line in Lines :
             self.tree_csv.insert('', tk.END, values=line)
 
+    def Open_Data_Directory(self):
+    #this function opens the project data directory
+
+        if self.controller.shared_data["Project_Dir"] == None:
+            messagebox.showinfo("Error", "You must create a project first")
+            return
+
+        File_Manager_Tool.Open_Directory(self.controller.shared_data["Project_Dir"])
+
+
 #classes actions
     def Add_Class(self,Val_Split = 0.2):
         #this function adds a class to the project csv
@@ -143,11 +160,9 @@ class C_I_win(tk.Frame):
         if class_path == "":
             return
         class_name= class_path.split("/")[-1] #the class name corresponds to the folder's name
-        print(class_name)
 
         img_ctn = File_Manager_Tool.count_files_in_dir(class_path)
-        print(img_ctn)
-            
+
         self.Current_Csv.loc[len(self.Current_Csv.index)] = [ len(self.Current_Csv.index),class_name, str(img_ctn), Val_Split, class_path]
         self.Current_Csv.to_csv(self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv",index=False)
         self.Load_Csv_File(File_Path= self.controller.shared_data["Project_Dir"] + "/Project_Classes.csv")

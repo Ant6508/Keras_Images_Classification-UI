@@ -69,7 +69,7 @@ class R_win(tk.Frame):
             messagebox.showerror("Error","You need to create and train a model first")
             return
 
-        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],size=400,batch_size=3,Seed=None)
+        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],batch_size=3,Seed=None)
         Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
 

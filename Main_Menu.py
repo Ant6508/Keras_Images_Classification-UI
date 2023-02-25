@@ -86,6 +86,12 @@ class Application(tk.Tk):
         menu_file.add_command(label="Exit", command=self.quit)
         menu_bar.add_cascade(label="File", menu=menu_file)
 
+        menu_options = tk.Menu(menu_bar, tearoff=0)
+        menu_options.add_command(label="Data Options")
+        menu_bar.add_cascade(label="Datas", menu=menu_options)
+
+
+
         menu_help = tk.Menu(menu_bar, tearoff=0)
         menu_help.add_command(label="About")
         menu_bar.add_cascade(label="Help",menu=menu_help)
