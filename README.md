@@ -32,5 +32,5 @@ I will soon release a quick Youtube video to explain how to use the ui.
 ## Contributing
 
 If you want to contribuate to this project by any means (coding , beta testing, improvement ideas), make sure to contact me __by mail__ via that adress :
-(mailto:julien.rongere@.fr?subject=[GitHub])
+[Julien RONGERE](mailto:julien.rongere20@gmail.com?subject=[GitHub])
 
