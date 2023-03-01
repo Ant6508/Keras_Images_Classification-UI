@@ -32,5 +32,5 @@ I will soon release a quick Youtube video to explain how to use the ui.
 ## Contributing
 
 If you want to contribuate to this project by any means (coding , beta testing, improvement ideas), make sure to contact me __by mail__ via that adress :
-[Dr. Ken Lunde](mailto:lunde@adobe.com?subject=[GitHub] Source Han Sans)
+(mailto:julien.rongere@.fr?subject=[GitHub])
 
