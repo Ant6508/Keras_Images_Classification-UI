@@ -6,12 +6,12 @@ import tensorflow as tf
 from tensorflow import keras
 import pandas
 import numpy as np
-from tensorflow.keras import layers
+from keras import layers
 
 #functions
 
 def Load_Keras_Model(Model_Path):
-	model = tensorflow.keras.models.load_model(Model_Path)
+	model = tf.keras.models.load_model(Model_Path)
 	return model
 
 def Save_Keras_Model(Model,Model_Path):
@@ -19,6 +19,7 @@ def Save_Keras_Model(Model,Model_Path):
 
 
 def Load_Premade(Size,Classes_Count):
+	return
 	model = tf.keras.Sequential([
     	layers.experimental.preprocessing.Rescaling(1./255,input_shape = (Size,Size,1)),
     	layers.Conv2D(128,2,activation = "relu"),
@@ -36,8 +37,8 @@ def Load_Premade(Size,Classes_Count):
 
 	return model
 
-p = Load_Premade(400,4)
-p.save("model")
+#p = Load_Premade(400,4)
+#p.save("model")
 
 def Compile_Model(Model,optimizer = 'adam'):
 	Model.compile(optimizer = optimizer,

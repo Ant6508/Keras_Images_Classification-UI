@@ -18,11 +18,11 @@ from threading import Thread
 import time
 import shutil
 
-import Data_From_Dir_manager
-import Keras_Model_Manager
-import File_Manager_Tool
-import Project_Manager
-import Req_Manager
+import Tools.Data_From_Dir_manager as Data_From_Dir_manager
+import Tools.Keras_Model_Manager as Keras_Model_Manager
+import Tools.File_Manager_Tool as File_Manager_Tool
+import Tools.Project_Manager  as Project_Manager
+import Tools.Req_Manager  as Req_Manager
 
 import Model_Manager
 
@@ -53,9 +53,10 @@ class R_win(tk.Frame):
 
 
     def Create_Buttons(self):
+        #creates the buttons that will be used in the form
 
 
-        Fit_Model_Button = tk.Button(self,text="Fit the model",fg="red",command= self.Start_Fitting)
+        Fit_Model_Button = tk.Button(self,text="Fit the model",fg="red",command=self.Start_Fitting)
         Fit_Model_Button.place(x=25,y=280)
 
 
@@ -65,24 +66,44 @@ class R_win(tk.Frame):
         # Fits the model while displaying the accuracy to the user
         #also saves the model in the project directory as well as the log file
   
+        self.done_training = False
+
         if self.controller.shared_data["Current_Model"] == None or self.controller.shared_data["Current_Model"].built == False:
             messagebox.showerror("Error","You need to create and train a model first")
             return
+        
+        #check if the data folder contains images
+        if len(os.listdir(self.controller.shared_data["Project_Dir"] + "/Data/Training")) == 0  :
+            messagebox.showerror("Error","You need to add images to the training folder")
+            return
+        elif len(os.listdir(self.controller.shared_data["Project_Dir"] + "/Data/Validation")) == 0  :
+            messagebox.showerror("Error","You need to add images to the validation folder")
+            return
+
 
         Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],batch_size=3,Seed=None)
         Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
 
         acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback()) #fit the model
+        
+        self.done_training = True
 
         messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
 
-        Model_Name = simpledialog.askstring("Save trained model","Enter the model Name")
+        self.controller.after(0,self.save_model)
+
+        return
+    def save_model(self):
+        #saves the model in the project directory
+        Model_Name = simpledialog.askstring("Model Name","Enter the name of the model")
+
         if Model_Name == None:
             Model_Name = "My_Model"
 
+        Model_Name.replace(" ","_")
         self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
-        shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "_log.txt")
+        shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/log.txt")
 
 
     def Start_Fitting(self):
@@ -91,16 +112,16 @@ class R_win(tk.Frame):
             txt.write("")
 
 
-        self.t1=Thread(target=self.Display_Results)
-        self.t1.start()
-
         self.t2=Thread(target=self.Fit_Model)
         self.t2.start()
 
-    def Display_Results(self):
+        self.t1=Thread(target=self.Display_Results)
+        self.t1.start()
 
-        boo = True #boolean to check if the thread is still alive
-        while boo:
+    def Display_Results(self):
+        #displays the results of the training in the text box
+
+        while not self.done_training:
             self.Txt_Box.delete(1.0,END)
             with open("temp_log.txt",'r') as txt : 
 
@@ -109,8 +130,6 @@ class R_win(tk.Frame):
 
             self.Txt_Box.see(END)
             time.sleep(1)
-            boo = self.t2.is_alive() #boolean repreeenting if the fitting thread is still alive
-
         return
 
 

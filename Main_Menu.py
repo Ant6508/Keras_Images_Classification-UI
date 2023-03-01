@@ -142,4 +142,5 @@ if __name__ == "__main__":
     app.title("Py_Auto_Class")
     app.geometry("440x350")
     app.resizable(width=False, height=False)
+    app.iconbitmap("Images/Icon.ico")
     app.mainloop()

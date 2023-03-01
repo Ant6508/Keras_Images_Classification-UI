@@ -14,6 +14,9 @@ from keras.preprocessing import image
 #Aux functions
 
 def Create_Subsets(Path,Classes_df,i):
+	#function that creates the training and validation subsets for a given class
+
+
 	os.mkdir( os.path.join(Path, 'Training'))    # creates the dirs of the new class
 	os.mkdir( os.path.join(Path, 'Validation'))
 
@@ -48,7 +51,8 @@ def Import_Classes_Images(parent,Classes_df,Data_dir):
 	check_subsets(Classes_df)
 	check_label.destroy()
 	
-	for i in range(Nbr_Classes):
+	for i in range(Nbr_Classes): # for each class
+
 		Path = Classes_df.loc[i,"Path"]
 		Class_name = Classes_df.loc[i,"Class_Name"]
 
@@ -80,7 +84,7 @@ def Import_Classes_Images(parent,Classes_df,Data_dir):
 
 				shutil.copy2(Train_Images_Path + "/" + image , Data_dir + r"/Training/"+ Class_name + "/" + image)  #copies each images to prepare it right for the IA
 				parent.progress_bar.step(1) # updates the progress bar
-			except  :
+			except  shutil.SameFileError:
 				#case where the image is already in the folder
 				parent.progress_bar.step(1)
 				pass
@@ -97,9 +101,15 @@ def Import_Classes_Images(parent,Classes_df,Data_dir):
 
 
 		for image in Images_List:
-			shutil.copy2(Val_Images_Path + "/" + image , Data_dir + r"/Validation/"+ Class_name + "/" + image)
-			parent.progress_bar.step(1)
+			try:
 
+				shutil.copy2(Val_Images_Path + "/" + image , Data_dir + r"/Validation/"+ Class_name + "/" + image)
+				parent.progress_bar.step(1)
+
+			except  shutil.SameFileError:
+				#case where the image is already in the folder
+				parent.progress_bar.step(1)
+				pass
 		label.destroy()
 
 
