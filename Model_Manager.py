@@ -179,9 +179,6 @@ class M_M_win(tk.Frame):
 
         self.Wid_Dict = {} #dictionary which contains the widgets of the modify layer window
         self.arg_list = [] #list which contains the parameters of the selected layer
-
-        #disabling the main window
-        self.mod_child_win.grab_set()
         
 
         if self.tree_model.selection() == (): #if no layer is selected
@@ -196,6 +193,9 @@ class M_M_win(tk.Frame):
         self.mod_child_win = tk.Toplevel(self)
         self.mod_child_win.title("Modify this layer")
         self.mod_child_win.geometry("350x170")
+
+        #disabling the main window
+        self.mod_child_win.grab_set()
 
         self.Current_layer_label = tk.Label(self.mod_child_win,text=f"Current layer:\n{self.layer_name}")
         self.Current_layer_label.place(x=140,y=25)
@@ -217,11 +217,11 @@ class M_M_win(tk.Frame):
         for arg in File_Manager_Tool.get_positional_arguments(layer):
             #places all the widgets related to the positional arguments of the layer
 
-            label = Label(self.mod_child_win, text=arg+" : ", fg='red')
+            label = tk.Label(self.mod_child_win, text=arg+" : ", fg='red')
             label.place(x=25,y=y_courant)
 
             value = File_Manager_Tool.to_string(layer.get_config()[arg])
-            entry = Entry(self.mod_child_win, width=20)
+            entry = tk.Entry(self.mod_child_win, width=20)
             entry.place(x=150,y=y_courant)
             entry.insert(0,value)
 
@@ -234,15 +234,15 @@ class M_M_win(tk.Frame):
         for arg,value in modified_params.items():
             #places all the widgets related to the non default parameters of the layer
 
-            label = Label(self.mod_child_win, text=arg+" : ", fg='blue')
+            label = tk.Label(self.mod_child_win, text=arg+" : ", fg='blue')
             label.place(x=25,y=y_courant)
             
             value = File_Manager_Tool.to_string(value)
-            entry = Entry(self.mod_child_win, width=20)
+            entry = tk.Entry(self.mod_child_win, width=20)
             entry.place(x=150,y=y_courant)
             entry.insert(0,value)
 
-            button = Button(self.mod_child_win, text="Delete", command= lambda arg=arg : self.Delete_param_widgets(arg,self.mod_child_win))
+            button = tk.Button(self.mod_child_win, text="Delete", command= lambda arg=arg : self.Delete_param_widgets(arg,self.mod_child_win))
             button.place(x=300,y=y_courant)
             
             self.Wid_Dict[arg] = [label,entry,button]

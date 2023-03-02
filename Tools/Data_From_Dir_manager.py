@@ -54,7 +54,7 @@ def Import_Classes_Images(parent,Classes_df,Data_dir):
 	for i in range(Nbr_Classes): # for each class
 
 		Path = Classes_df.loc[i,"Path"]
-		Class_name = Classes_df.loc[i,"Class_Name"]
+		Class_name = str(Classes_df.loc[i,"Class_Name"])
 
 		
 		try :

@@ -17,6 +17,7 @@ from tensorflow import keras
 from threading import Thread
 import time
 import shutil
+import matplotlib.pyplot as plt
 
 import Tools.Data_From_Dir_manager as Data_From_Dir_manager
 import Tools.Keras_Model_Manager as Keras_Model_Manager
@@ -59,6 +60,9 @@ class R_win(tk.Frame):
         Fit_Model_Button = tk.Button(self,text="Fit the model",fg="red",command=self.Start_Fitting)
         Fit_Model_Button.place(x=25,y=280)
 
+        Stop_training_Button = tk.Button(self,text="Stop training",fg="red",command=self.Stop_Training)
+        Stop_training_Button.place(x=200,y=280)
+
 
 #aux fonctions creations
 
@@ -79,9 +83,11 @@ class R_win(tk.Frame):
         elif len(os.listdir(self.controller.shared_data["Project_Dir"] + "/Data/Validation")) == 0  :
             messagebox.showerror("Error","You need to add images to the validation folder")
             return
+        
 
 
-        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],batch_size=3,Seed=None)
+
+        Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],batch_size=self.batch_size,Seed=None)
         Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
 
@@ -93,7 +99,10 @@ class R_win(tk.Frame):
 
         self.controller.after(0,self.save_model)
 
+        Thread(target = self.Show_Plot).start()
+
         return
+    
     def save_model(self):
         #saves the model in the project directory
         Model_Name = simpledialog.askstring("Model Name","Enter the name of the model")
@@ -104,6 +113,7 @@ class R_win(tk.Frame):
         Model_Name.replace(" ","_")
         self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
         shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/log.txt")
+        shutil.move("acc_array.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/data_array.txt")
 
 
     def Start_Fitting(self):
@@ -111,6 +121,8 @@ class R_win(tk.Frame):
         with open("temp_log.txt","w") as txt: #clear the log file
             txt.write("")
 
+        #ask for the batch size 
+        self.batch_size = simpledialog.askinteger("Batch Size","Enter the batch size",minvalue=1,maxvalue=1000)
 
         self.t2=Thread(target=self.Fit_Model)
         self.t2.start()
@@ -132,6 +144,33 @@ class R_win(tk.Frame):
             time.sleep(1)
         return
 
+    def Show_Plot(self):
+        #shows the plot of the accuracy and loss of the model
+
+        data_file = open("acc_array.txt","r")
+        data = data_file.readlines()
+        X,Y = [],[]
+        for line in data:
+            (x,y) = eval(line)
+            X.append(x)
+            Y.append(y)
+        plt.plot(X,Y)
+        plt.show()
+
+    def Stop_Training(self):
+        #stops the training of the model
+
+        self.done_training = True
+
+        self.controller.shared_data["Current_Model"].stop_training = True
+        messagebox.showinfo("Information","Training stopped")
+
+        self.controller.after(0,self.save_model)
+
+        Thread(target = self.Show_Plot).start()
+
+        return
+        
 
 class CustomCallback(keras.callbacks.Callback):
     #custom callback to display the results of the training
@@ -142,9 +181,15 @@ class CustomCallback(keras.callbacks.Callback):
 
         self.Add_2_Log("Training has begun...\n\n\n")
 
+        self.X = [] # batch abscissas
+        self.Y = [] # accuracy ordinates
+
+        self.current_batch = 0
+
     def on_train_end(self, logs=None):
 
         self.Add_2_Log("Training has ended")
+
 
     def on_epoch_begin(self, epoch, logs=None):
 
@@ -163,9 +208,22 @@ class CustomCallback(keras.callbacks.Callback):
 
         self.Add_2_Log(f"After batch {batch} , accuracy: {acc}, loss: {loss}\n")
 
+        self.current_batch +=1
+        self.Add_2_Array_File(acc)
+
+        self.X.append(self.current_batch)
+        self.Y.append(acc)
+
     def Add_2_Log(self,text):
         #add the text to log file
 
         with open("temp_log.txt","a") as txt:
 
             txt.write(text)
+
+    def Add_2_Array_File(self,acc):
+        #add the accuracy to the array
+     
+        with open("acc_array.txt","a") as txt:
+            
+            txt.write(f"{(self.current_batch,acc)}\n") 

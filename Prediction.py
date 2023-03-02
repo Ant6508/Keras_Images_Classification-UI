@@ -40,6 +40,7 @@ class Prediction_win(tk.Frame):
         self.y_class_label = tk.Label(self,text = "Predicted Class : \n",font=("Helvetica", 10))
         self.y_class_label.place(x=310,y=120)
 
+        self.image = None 
         self.create_image_reader()
         self.Create_Buttons()
         
@@ -81,6 +82,9 @@ class Prediction_win(tk.Frame):
         #this function predicts the class of the image and displays the result 
 
         model = self.controller.shared_data["Current_Model"]
+
+        if self.image == None:
+            return
 
         self.image = self.image.resize((model.input_shape[1],model.input_shape[2]),  Image.ANTIALIAS) #resize the image to the input shape of the model
     

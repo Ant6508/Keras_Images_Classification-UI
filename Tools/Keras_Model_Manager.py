@@ -7,6 +7,7 @@ from tensorflow import keras
 import pandas
 import numpy as np
 from keras import layers
+import matplotlib.pyplot as plt
 
 #functions
 
