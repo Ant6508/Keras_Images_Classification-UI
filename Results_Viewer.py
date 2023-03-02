@@ -44,7 +44,7 @@ class R_win(tk.Frame):
   
     def Create_Text_Box(self):
 
-        self.Txt_Box = tk.Text(self, height=14, width=47)
+        self.Txt_Box = tk.Text(self, height=14, width=47,state="disabled") #read-only entry
 
         self.vsb = tk.Scrollbar(self, orient="vertical", command=self.Txt_Box.yview)
         self.Txt_Box.configure(yscrollcommand=self.vsb.set)
