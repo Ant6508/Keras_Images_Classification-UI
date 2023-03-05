@@ -381,14 +381,15 @@ class M_M_win(tk.Frame):
 
             self.controller.shared_data["Current_Model"] = keras.Sequential() #initates the model
 
-            self.Add_Layer(self)
+            return self.Build_layer() #calls itself to build the layer
+            
 
         else : #we iterates throught the parameters the user entered and creates the layer with them
 
             l ="layers." + layer + "("
 
             for arg in self.arg_list:
-                ans = self.Wid_Dict[arg][1].get() #gets the paramaters the user entered as string
+                ans = self.Wid_Dict[arg][1].get("1.0",'end-1c') #gets the paramaters the user entered as string
                
                 l+= arg + "=" + ans + ","
 
