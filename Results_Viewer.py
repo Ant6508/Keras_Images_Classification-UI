@@ -1,12 +1,6 @@
 import os
+import queue
 
-def get_active_dir():
-    path = os.getcwd()
-    path = path.replace("\\","/")
-    return path
-
-import sys
-sys.path.insert(1, get_active_dir() + '/Tools')
 
 import tkinter as tk
 from tkinter import *
@@ -38,6 +32,8 @@ class R_win(tk.Frame):
         self.Create_Text_Box()
         self.Create_Buttons()
 
+        # Bind the custom event to a function
+        self.bind('<<UpdateText>>', self.update_text)
 
 #Widgets creations
 
@@ -84,14 +80,15 @@ class R_win(tk.Frame):
             messagebox.showerror("Error","You need to add images to the validation folder")
             return
         
-
-
-
         Train_Data,Val_Data =  Data_From_Dir_manager.Create_Classes_Data(self.controller.shared_data["Project_Dir"],batch_size=self.batch_size,Seed=None)
         Keras_Model_Manager.Compile_Model(self.controller.shared_data["Current_Model"])
 
+        #create the log file on the project directory
+        with open(self.controller.shared_data["Project_Dir"] +  "/temp_log.txt","w") as txt:
+            txt.write("This file contains the log of the training of the model\n\n")
 
-        acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback()) #fit the model
+
+        acc = Keras_Model_Manager.Fit_Model(self.controller.shared_data["Current_Model"],Train_Data,Val_Data,CustomCallback(self)) #fit the model , the callback will be used to display the accuracy
         
         self.done_training = True
 
@@ -112,37 +109,23 @@ class R_win(tk.Frame):
 
         Model_Name.replace(" ","_")
         self.controller.shared_data["Current_Model"].save(self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name)
-        shutil.move("temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/log.txt")
-        shutil.move("acc_array.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/data_array.txt")
+        shutil.move(self.controller.shared_data["Project_Dir"] + "/temp_log.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/log.txt")
+        shutil.move(self.controller.shared_data["Project_Dir"] + "/acc_array.txt",self.controller.shared_data["Project_Dir"] + '/Ia_Models/' + Model_Name + "/data_array.txt")
 
 
     def Start_Fitting(self):
 
-        with open("temp_log.txt","w") as txt: #clear the log file
-            txt.write("")
 
         #ask for the batch size 
         self.batch_size = simpledialog.askinteger("Batch Size","Enter the batch size",minvalue=1,maxvalue=1000)
 
+        self.q = queue.Queue()
+
+
         self.t2=Thread(target=self.Fit_Model)
         self.t2.start()
 
-        self.t1=Thread(target=self.Display_Results)
-        self.t1.start()
-
-    def Display_Results(self):
-        #displays the results of the training in the text box
-
-        while not self.done_training:
-            self.Txt_Box.delete(1.0,END)
-            with open("temp_log.txt",'r') as txt : 
-
-                for line in txt.readlines():
-                    self.Txt_Box.insert("end",line)    
-
-            self.Txt_Box.see(END)
-            time.sleep(1)
-        return
+        self.update_text()
 
     def Show_Plot(self):
         #shows the plot of the accuracy and loss of the model
@@ -170,12 +153,30 @@ class R_win(tk.Frame):
         Thread(target = self.Show_Plot).start()
 
         return
-        
+      
+    def update_text(self,event=None):
+        #updates the text box with the accuracy of the model
+
+        try:
+            Text = self.q.get_nowait()
+        except queue.Empty:
+            pass
+        else:
+            self.Txt_Box.configure(state="normal")
+            self.Txt_Box.insert(tk.END,Text)
+            self.Txt_Box.see(tk.END)
+            self.Txt_Box.update()
+            self.Txt_Box.configure(state="disabled")
+
 
 class CustomCallback(keras.callbacks.Callback):
     #custom callback to display the results of the training
     #also saves the results in a log file
 
+    def __init__(self, parent, *args, **kwargs):
+        super(CustomCallback, self).__init__(*args, **kwargs)
+        self.parent = parent
+        self.queue = parent.q
 
     def on_train_begin(self, logs=None):
 
@@ -217,13 +218,20 @@ class CustomCallback(keras.callbacks.Callback):
     def Add_2_Log(self,text):
         #add the text to log file
 
-        with open("temp_log.txt","a") as txt:
-
+        with open(self.parent.controller.shared_data["Project_Dir"] +  "/temp_log.txt","a") as txt:
             txt.write(text)
+
+
+        self.queue.put(text)
+
+        # Generate a custom event to tell the GUI to update which is triggered by the callback.
+        self.parent.event_generate('<<UpdateText>>', when='tail')
+
+
 
     def Add_2_Array_File(self,acc):
         #add the accuracy to the array
      
-        with open("acc_array.txt","a") as txt:
+        with open(self.parent.controller.shared_data["Project_Dir"] + "/acc_array.txt","a") as txt:
             
             txt.write(f"{(self.current_batch,acc)}\n") 

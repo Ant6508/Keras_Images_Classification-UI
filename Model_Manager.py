@@ -389,7 +389,7 @@ class M_M_win(tk.Frame):
             l ="layers." + layer + "("
 
             for arg in self.arg_list:
-                ans = self.Wid_Dict[arg][1].get("1.0",'end-1c') #gets the paramaters the user entered as string
+                ans = self.Wid_Dict[arg][1].get() #gets the paramaters the user entered as string
                
                 l+= arg + "=" + ans + ","
 
@@ -406,7 +406,7 @@ class M_M_win(tk.Frame):
 
         layer_name = layer.__class__.__name__ #gets the layer's name
 
-        line =  [len(self.controller.shared_data["Current_Model"].layers),layer_name,"parametres non dispo"]
+        line =  [len(self.controller.shared_data["Current_Model"].layers)-1,layer_name,"parametres non dispo"]
 
         self.tree_model.insert('', tk.END, values=line)
 
@@ -417,6 +417,7 @@ class M_M_win(tk.Frame):
 
         model = self.controller.shared_data["Current_Model"]
         index_to_modify = self.tree_model.item(self.tree_model.selection())["values"][0]
+        print(index_to_modify)
         
         layer = self.Build_layer() #gets the layer
         self.replace_layer(layer,index_to_modify) #replaces the layer in the model

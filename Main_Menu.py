@@ -90,8 +90,7 @@ class Application(tk.Tk):
         menu_options.add_command(label="Data Options")
         menu_bar.add_cascade(label="Datas", menu=menu_options)
 
-
-
+ 
         menu_help = tk.Menu(menu_bar, tearoff=0)
         menu_help.add_command(label="About")
         menu_bar.add_cascade(label="Help",menu=menu_help)
@@ -121,15 +120,19 @@ class Application(tk.Tk):
         messagebox.showinfo("Project Created","The project has been created")
 
     def Load_Project(self):
-        #function that loads the project
+        #function that loads a project
+        #the project is loaded by selecting the project directory which contains the project classes file
 
         ans = self.shared_data["Project_Dir"] = filedialog.askdirectory(title="Where is your project directory?")
+
         if ans == "": #if the user cancels the operation
             return
+        
         try:
             File_Path = self.shared_data["Project_Dir"] + "/Project_Classes.csv"
             Classes_Importer.C_I_win.Load_Csv_File(self.frames["C_I_win"] ,File_Path = File_Path)
             self.shared_data["Classes_num"] = len(pandas.read_csv(File_Path).index)
+
         except FileNotFoundError:
             messagebox.showerror("Error","The project is not valid")
             return
