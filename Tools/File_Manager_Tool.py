@@ -1,3 +1,11 @@
+"""
+This module contains the subfoncions that treats with folders, files 
+
+
+"""
+
+
+
 from keras import layers
 import os
 import inspect
