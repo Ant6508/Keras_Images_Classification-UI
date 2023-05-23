@@ -1,7 +1,10 @@
 """
 Created by : Rongere Julien
 Date : Sepctember 2022
+
 Goal : this file initialize the app itself , declares the different forms and creates the menu bar
+    It behaves as the main of this while project for the moment
+    
 """
 
 

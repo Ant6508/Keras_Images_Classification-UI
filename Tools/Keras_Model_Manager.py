@@ -93,3 +93,27 @@ def Create_Model(Layers_List,Options_List):
 	return Model
 
 
+def set_unique_name(model,new_layer):
+
+	#this function sets a unique name for a new layer to be added to the model
+	#the name is the layer type + the number of layers of this type in the model
+	#so we iterate over the layers of the model and count the number of layers of the same type
+
+	#the name of the new layer
+	new_layer_name = new_layer._name
+
+	#the type of the new layer
+	new_layer_type = new_layer_name.split("_")[0]
+
+	count = 0
+
+	for layer in model.layers:
+
+		if layer.name.split("_")[0] == new_layer_type:
+
+			count += 1
+
+	new_layer._name = new_layer_type + "_" + str(count)
+
+	return new_layer
+
