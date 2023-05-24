@@ -146,7 +146,7 @@ class M_M_win(tk.Frame):
             messagebox.showerror("Error","An error occured while loading the model")
             return
  
-        self.widgets_dict["Model_Treeview"].delete(*self.widgets_dict["Model_Treeview"].get_children()) #clear the model viewer
+        self.widgets_dict["Model_Treeview"].delete(*self.widgets_dict["Model_Treeview"].get_children()) #clear the model viewerorga
 
         for i in range(len(self.controller.shared_data["Current_Model"].layers)):
             layer = self.controller.shared_data["Current_Model"].layers[i]
@@ -184,7 +184,7 @@ class M_M_win(tk.Frame):
         Layer_Combobox = ttk.Combobox(self.add_child_win,values=sorted(self.keras_layers_list) , state="readonly",width=30) #combobox which contains the keras layers
         self.Top_Level_Wid_Dic["Layer_Combobox"] = Layer_Combobox
         self.Top_Level_Wid_Dic["Layer_Combobox"].place(x=80,y=45)
-        self.Top_Level_Wid_Dic["Layer_Combobox"].bind("<<ComboboxSelected>>", self.New_Layer_Selected) # on layer selection, the parametre widgets are re-initialized
+        self.Top_Level_Wid_Dic["Layer_Combobox"].bind("<<ComboboxSelected>>", self.New_Layer_Selected,) # on layer selection, the parametre widgets are re-initialized
 
 
         Add_Button = tk.Button(self.add_child_win,text="Add this layer",command= self.Add_Layer , state ="disabled")
@@ -243,7 +243,7 @@ class M_M_win(tk.Frame):
         self.Top_Level_Wid_Dic["New_Arg_Button"] = New_Arg_Button
         self.Top_Level_Wid_Dic["New_Arg_Button"].place(x=25,y=125)
 
-        Arg_Combobox = ttk.Combobox(self.mod_child_win,values=[""] ,width=25)
+        Arg_Combobox = ttk.Combobox(self.mod_child_win,values=[""] ,width=25,)
         self.Top_Level_Wid_Dic["Arg_Combobox"] = Arg_Combobox
         self.Top_Level_Wid_Dic["Arg_Combobox"].place(x=150,y=125)
         #widgets creation end
@@ -291,8 +291,18 @@ class M_M_win(tk.Frame):
 
         #increases the height of the window according to the number of parameters that will be displayed
 
-        for _ in range(0,len(self.arg_list)):
-            self.Inc_height(30, self.mod_child_win)
+        param_count = len(self.arg_list)
+        self.mod_child_win.geometry("350x"+str(170+30*param_count))
+
+
+
+        #fill the arg combobox with the remaining args
+
+        for arg in File_Manager_Tool.get_default_args(layer):
+            if arg not in self.arg_list:
+                self.Top_Level_Wid_Dic["Arg_Combobox"].config(values=[*self.Top_Level_Wid_Dic["Arg_Combobox"]["values"],arg])
+
+        
 
         self.mod_child_win.mainloop()
 
@@ -366,16 +376,19 @@ class M_M_win(tk.Frame):
         self.Top_Level_Wid_Dic["Add_Button"].config(state="normal")
         self.Top_Level_Wid_Dic["Arg_Combobox"].config(state="normal")
     
-
+        
         self.Top_Level_Wid_Dic["Arg_Combobox"]["values"] = []
+        self.Top_Level_Wid_Dic["Arg_Combobox"].set('') #resets the combobox value
+
+        self.add_child_win.geometry("350x180") #resets the window size
+        self.add_child_win.update()
 
         #deletes the widgets associated to the previous layer
         try:
             for arg in self.Param_Wid_Dic.values():
                 for wid in arg:
                     wid.destroy()
-                    self.Inc_height(-30,self.add_child_win)
-                self.Top_Level_Wid_Dic["Arg_Combobox"].set('')
+                
         except AttributeError:
             pass
 
@@ -445,7 +458,6 @@ class M_M_win(tk.Frame):
             for arg in self.arg_list:
 
                 #gets the paramaters the user entered as string
-                print(type(self.Param_Wid_Dic[arg][1]))
                 ans = self.Param_Wid_Dic[arg][1].get("1.0", "end-1c")
   
                 l+= arg + "=" + ans + ","
@@ -459,7 +471,7 @@ class M_M_win(tk.Frame):
 
         except Exception as e:
 
-            print("the following error occured during layer creation : \n",e)
+            simpledialog.messagebox.showerror("The following error occured",e) #displays the error message
             return None
         
         layer = Keras_Model_Manager.set_unique_name(self.controller.shared_data["Current_Model"],layer)
@@ -469,7 +481,6 @@ class M_M_win(tk.Frame):
 
         layer = self.Build_layer() #gets the layer
         if layer == None:
-            print("error")
             return
 
         self.controller.shared_data["Current_Model"].add(layer) #adds the layer to the model
@@ -616,8 +627,7 @@ class M_M_win(tk.Frame):
         except :
             top.geometry(previous_geometry)
         top.update()
-        print("previous height : {} new height : {}".format(current_height,new_height))        
-
+        
 
     def get_current_height(self,top):
 
