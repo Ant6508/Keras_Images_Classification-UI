@@ -1,7 +1,7 @@
 
 # Keras Images Classification UI
 
-This project aims to helping IA enjoyers to create images Classification projects wtih a simple UI.
+This project aims at helping IA enjoyers to create images Classification projects wtih a simple UI.
 
 It ables anybody to create a clean working directory to start off your project, import your data and train models in minutes.
 
