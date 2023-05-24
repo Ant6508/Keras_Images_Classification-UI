@@ -12,8 +12,10 @@ from keras.preprocessing import image
 
 
 #Aux functions
+#Interface independent functions are noticed by the comment #Aux function
 
-def Create_Subsets(Path,Classes_df,i):
+
+def Create_Subsets(Path,Classes_df,i): #Aux function
 	#function that creates the training and validation subsets for a given class
 
 
@@ -118,6 +120,9 @@ def Import_Classes_Images(parent,Classes_df,Data_dir):
 
 	messagebox.showinfo("Importation done", "All the images were imported successfully")
 	return #stops the associated thread
+
+
+
 def check_subsets(Classes_df):
 	# checks if the user already has created 2 subets for training and validation 
 	# if not, it creates them
@@ -132,7 +137,7 @@ def check_subsets(Classes_df):
 
 	
 
-def Create_Classes_Data(Project_Dir,batch_size=32,Seed=None):
+def Create_Classes_Data(Project_Dir,batch_size=32,Seed=None): #Aux function
 	#function which creates and returns the training and validation data from the classes in the project dir
 	#the data is returned as a tf.data.Dataset object which can be used to train the model
 
@@ -153,7 +158,7 @@ def Create_Classes_Data(Project_Dir,batch_size=32,Seed=None):
 	return Train_Data,Val_Data
 
 
-def sort_folder(folder_path,model):
+def sort_folder(folder_path,model): #aux function
 	#function which sorts the images in a folder according to the keras model given in parameter
 	#the images are sorted in subfolders with the name of the class predicted by the model
 

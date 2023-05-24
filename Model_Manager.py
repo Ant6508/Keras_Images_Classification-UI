@@ -23,7 +23,7 @@ import numpy as np
 import Tools.Keras_Model_Manager as Keras_Model_Manager
 import Tools.File_Manager_Tool as File_Manager_Tool
 import Tools.Project_Manager as Project_Manager
-import Tools.Req_Manager as Req_Manager
+
 
 from tensorflow import keras
 import pandas

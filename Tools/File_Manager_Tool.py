@@ -1,6 +1,7 @@
 """
-This module contains the subfoncions that treats with folders, files 
+This module contains the subfoncions that deals with folders and files 
 
+All the methods are Interface independent
 
 """
 
@@ -12,20 +13,22 @@ import inspect
 from inspect import signature
 import threading
 
+
+
 #functions for directory management
-def get_immediate_subdirectories(a_dir):
+def get_immediate_subdirectories(a_dir): 
     #function that returns the direct subdirectories of a directory
     return [name for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-def get_active_dir():
+def get_active_dir(): 
     #function that returns the active directory the app was lunch from
     path = os.getcwd()
     path = path.replace("\\","/")
     return path
  
 #functions for layer management
-def get_default_args(layer):
+def get_default_args(layer): 
     #function that returns the couples (arg_name, default_value) of the default arguments of a layer which are not positional arguments or kwargs
     sig = signature(layer.__init__) #get the signature of the layer
     return {p.name : p.default for p in sig.parameters.values() if p.default is not inspect.Parameter.empty and p.name not in get_positional_arguments(layer) and p.name != 'kwargs'}

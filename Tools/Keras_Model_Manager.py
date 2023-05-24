@@ -1,4 +1,9 @@
+"""
+Module for managing keras models and layers
 
+All the functions are Interface independent
+
+"""
 
 #imports
 

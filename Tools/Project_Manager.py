@@ -1,3 +1,13 @@
+"""
+This file contains the functions to create and load a project.
+A project is a folder that contains the data, the code and the models of the project.
+
+All the functions are interface independant
+
+"""
+
+
+
 #imports
 
 import pandas
