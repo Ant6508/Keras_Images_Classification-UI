@@ -36,6 +36,8 @@ class C_I_win(tk.Frame):
         self.progress_bar = None
   
 
+        self.Widgets_Dict = {} #dictionary that will contain the different pairs (widget name , widget object)
+
         self.Create_Csv_reader()
         self.Create_Reader_Buttons()
         self.Create_Import_Button()
@@ -45,16 +47,19 @@ class C_I_win(tk.Frame):
 
     def Create_Reader_Buttons(self):
         #this function initializes the buttons that allow the user to add or delete classes
+        #it is a must to store the images to avoid garbage collection
 
         #buttons that adds a class to the csv
         self.add_button_image = tk.PhotoImage(file=File_Manager_Tool.get_active_dir() + r"/images/add_button.png")
         rounded_add_button = tk.Button(self, image=self.add_button_image,command=self.Add_Class)
         rounded_add_button.place(x=355,y=50)
+        self.Widgets_Dict["add_button"] = rounded_add_button
 
         #buttons that removes a class from the csv
         self.del_button_image = tk.PhotoImage(file=File_Manager_Tool.get_active_dir() + r"/images/del.png")
         rounded_del_button = tk.Button(self, image=self.del_button_image,command=lambda: self.after(100,self.Del_Class))
         rounded_del_button.place(x=400,y=50)
+        self.Widgets_Dict["del_button"] = rounded_del_button
 
     def Create_Csv_reader(self):
         #this function creates the csv reader which displays the classes
@@ -64,26 +69,26 @@ class C_I_win(tk.Frame):
 
         columns = ('Id', 'Class_Name', 'Images_Ctn','Val_Split')
 
-        self.tree_csv = ttk.Treeview(csv_frame, columns=columns, show='headings')
+        self.Widgets_Dict["Classes_Viewer"] = ttk.Treeview(csv_frame, columns=columns, show='headings')
 
-        self.tree_csv.heading('Id', text='Id')
-        self.tree_csv.column("Id", minwidth=0, width=50, stretch=tk.NO)
+        self.Widgets_Dict["Classes_Viewer"].heading('Id', text='Id')
+        self.Widgets_Dict["Classes_Viewer"].column("Id", minwidth=0, width=50, stretch=tk.NO)
 
-        self.tree_csv.heading('Class_Name', text='Class Name')
-        self.tree_csv.column("Class_Name", minwidth=0, width=100, stretch=tk.NO)
+        self.Widgets_Dict["Classes_Viewer"].heading('Class_Name', text='Class Name')
+        self.Widgets_Dict["Classes_Viewer"].column("Class_Name", minwidth=0, width=100, stretch=tk.NO)
 
-        self.tree_csv.heading('Images_Ctn', text='Image total Count')
-        self.tree_csv.column("Images_Ctn", minwidth=0, width=100, stretch=tk.NO)
+        self.Widgets_Dict["Classes_Viewer"].heading('Images_Ctn', text='Image total Count')
+        self.Widgets_Dict["Classes_Viewer"].column("Images_Ctn", minwidth=0, width=100, stretch=tk.NO)
 
-        self.tree_csv.heading('Val_Split', text='Val Split')
-        self.tree_csv.column("Val_Split", minwidth=0, width=50, stretch=tk.NO)
+        self.Widgets_Dict["Classes_Viewer"].heading('Val_Split', text='Val Split')
+        self.Widgets_Dict["Classes_Viewer"].column("Val_Split", minwidth=0, width=50, stretch=tk.NO)
 
         #scrollbar
-        scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree_csv.yview)
+        scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.Widgets_Dict["Classes_Viewer"].yview)
         scrollbar.place(x=327,y=50,height=225)
 
-        self.tree_csv.configure(yscroll=scrollbar.set)
-        self.tree_csv.grid(sticky='nsew')
+        self.Widgets_Dict["Classes_Viewer"].configure(yscroll=scrollbar.set)
+        self.Widgets_Dict["Classes_Viewer"].grid(sticky='nsew')
 
     def Create_Import_Button(self):
         #this function creates the import button which allows the user to import the classes to his project directory
@@ -93,6 +98,8 @@ class C_I_win(tk.Frame):
                                             ( lambda : Data_From_Dir_manager.Import_Classes_Images #creates and run a thread that imports the classes
                                             (self,self.Current_Csv, self.controller.shared_data["Project_Dir"] + "/Data")))
         Import_Button.place(x=25,y=280)
+
+        self.Widgets_Dict["Import_Button"] = Import_Button
 
     def Create_Progress_Bar(self,maximum):
         #this function creates the progress bar which shows the user the progress of the current importation
@@ -114,6 +121,8 @@ class C_I_win(tk.Frame):
                                     command = self.Open_Data_Directory)
         Open_Data_Button.place(x=100,y=280)
 
+        self.Widgets_Dict["Open_Data_Button"] = Open_Data_Button
+
 #auxiliary fonctions
 #project functions
 
@@ -122,7 +131,7 @@ class C_I_win(tk.Frame):
         #and displays it in the csv reader
 
         self.Current_Csv = pandas.read_csv(File_Path)
-        self.tree_csv.delete(*self.tree_csv.get_children())
+        self.Widgets_Dict["Classes_Viewer"].delete(*self.Widgets_Dict["Classes_Viewer"].get_children())
 
         Lines = []
         for i in range(len(self.Current_Csv)):
@@ -130,7 +139,7 @@ class C_I_win(tk.Frame):
             Lines.append(l)
 
         for line in Lines :
-            self.tree_csv.insert('', tk.END, values=line)
+            self.Widgets_Dict["Classes_Viewer"].insert('', tk.END, values=line)
 
     def Open_Data_Directory(self):
     #this function opens the project data directory
@@ -166,11 +175,11 @@ class C_I_win(tk.Frame):
     def Del_Class(self):
         #this function removes the selected class from the csv and removes from the project directory
 
-        Selected_Class_Id = self.tree_csv.focus() #get the selected row
+        Selected_Class_Id = self.Widgets_Dict["Classes_Viewer"].focus() #get the selected row
         if Selected_Class_Id == "":
             messagebox.showinfo("Error", "You must select a class first")
             return
-        Selected_Class_Id = int(self.tree_csv.item(Selected_Class_Id)["values"][0])  #get the id of the selected row
+        Selected_Class_Id = int(self.Widgets_Dict["Classes_Viewer"].item(Selected_Class_Id)["values"][0])  #get the id of the selected row
  
         for i in range(Selected_Class_Id+1,len(self.Current_Csv)):
             self.Current_Csv.loc[i] =np.concatenate( ([i-1] , (self.Current_Csv.loc[i])[1:]) ) 

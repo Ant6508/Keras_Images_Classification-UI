@@ -15,9 +15,6 @@ import matplotlib.pyplot as plt
 
 import Tools.Data_From_Dir_manager as Data_From_Dir_manager
 import Tools.Keras_Model_Manager as Keras_Model_Manager
-import Tools.File_Manager_Tool as File_Manager_Tool
-import Tools.Project_Manager  as Project_Manager
-import Tools.Req_Manager  as Req_Manager
 
 import Model_Manager
 
@@ -94,10 +91,9 @@ class R_win(tk.Frame):
 
         messagebox.showinfo("Information",f"Your model was successfully trained\nwith the data you provided\nwith an accuracy of { round(acc[-1],3)*100  } %")
 
-        self.controller.after(0,self.save_model)
+        if self.done_training != True:
 
-        Thread(target = self.Show_Plot).start()
-
+            self.Stop_Training()
         return
     
     def save_model(self):
@@ -114,10 +110,12 @@ class R_win(tk.Frame):
 
 
     def Start_Fitting(self):
-
+        #starts the fitting of the model along with the thread that will display the accuracy
 
         #ask for the batch size 
         self.batch_size = simpledialog.askinteger("Batch Size","Enter the batch size",minvalue=1,maxvalue=1000)
+        if self.batch_size == None:
+            self.batch_size = 10
 
         self.q = queue.Queue()
 
@@ -130,15 +128,19 @@ class R_win(tk.Frame):
     def Show_Plot(self):
         #shows the plot of the accuracy and loss of the model
 
-        data_file = open("acc_array.txt","r")
-        data = data_file.readlines()
-        X,Y = [],[]
-        for line in data:
-            (x,y) = eval(line)
-            X.append(x)
-            Y.append(y)
-        plt.plot(X,Y)
+        path = self.controller.shared_data["Project_Dir"] + "/acc_array.txt"
+
+        with open(path,"r") as data_file:
+            data = data_file.readlines()
+            X,Y = [],[]
+            for line in data:
+                (x,y) = eval(line)
+                X.append(x)
+                Y.append(y)
+
+        plt.plot(X,Y,label="Accuracy of the model in function of the epochs")
         plt.show()
+        
 
     def Stop_Training(self):
         #stops the training of the model
@@ -148,10 +150,11 @@ class R_win(tk.Frame):
         self.controller.shared_data["Current_Model"].stop_training = True
         messagebox.showinfo("Information","Training stopped")
 
-        self.controller.after(0,self.save_model)
-
         Thread(target = self.Show_Plot).start()
 
+        self.controller.after(0,self.save_model)
+
+        
         return
       
     def update_text(self,event=None):
@@ -189,7 +192,7 @@ class CustomCallback(keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
 
-        self.Add_2_Log("Training has ended")
+        self.Add_2_Log("\n\n\nTraining has ended")
 
 
     def on_epoch_begin(self, epoch, logs=None):

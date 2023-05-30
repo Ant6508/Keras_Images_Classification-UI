@@ -52,7 +52,7 @@ class M_M_win(tk.Frame):
         self.widgets_dict["Model_Treeview"].bind("<Down>",lambda event:self.swap_layers(event))
 
 #widgets creation
-    def Create_Model_Viewer(self):
+    def Create_Model_Viewer(self):  
         #function which initializes the model viewer and adds it the widgets dictionary
 
         Model_frame = tk.Frame(self,bg="white",width=250,height=400)  

@@ -50,7 +50,7 @@ class Application(tk.Tk):
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
-
+        
         self.show_frame("C_I_win")
         self.create_menu_bar()
         self.Create_Nav_Bar()

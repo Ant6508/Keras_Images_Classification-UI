@@ -30,6 +30,8 @@ class Prediction_win(tk.Frame):
 
         self.name ="Predictions"
 
+        self.Widgets_Dict = {}
+
         self.y_pred_label = tk.Label(self,text = "Predicted Class : \n",font=("Helvetica", 10))
         self.y_pred_label.place(x=310,y=80)
         self.y_class_label = tk.Label(self,text = "Predicted Class : \n",font=("Helvetica", 10))
@@ -43,21 +45,33 @@ class Prediction_win(tk.Frame):
     def Create_Buttons(self):
         #this function creates the buttons that allow the user to open an image and predict its class
 
-        self.Predict_Button = tk.Button(self,text = "Predict",command = self.Predict,font=("Helvetica", 10))
-        self.Predict_Button.place(x=310,y=40)
+        Predict_Button = tk.Button(self,text = "Predict",command = self.Predict,font=("Helvetica", 10))
+        Predict_Button.place(x=310,y=40)
+        self.Widgets_Dict["Predict_Button"] = Predict_Button
 
-        self.Open_Image_Button = tk.Button(self,text = "Open Image",command = self.open_image)
-        self.Open_Image_Button.place(x=180,y=15)
 
-        self.sort_filder_button = tk.Button(self,text = "Sort Folder",command = self.sort_folder)
-        self.sort_filder_button.place(x=310,y=180)
+        Open_Image_Button = tk.Button(self,text = "Open Image",command = self.open_image)
+        Open_Image_Button.place(x=180,y=15)
+        self.Widgets_Dict["Open_Image_Button"] = Open_Image_Button
+        
+
+        sort_filder_button = tk.Button(self,text = "Sort Folder",command = self.sort_folder)
+        sort_filder_button.place(x=310,y=180)
+        self.Widgets_Dict["sort_filder_button"] = sort_filder_button
+
 
     def create_image_reader(self):
         #this function creates the frame where the image will be displayed
 
-        self.image_reader = tk.Frame(self,bg="white",width=250,height=250)
-        self.image_reader.place(x=50,y=60)
+        image_reader = tk.Frame(self,bg="white",width=250,height=250)
+        image_reader.place(x=50,y=60)
+        self.Widgets_Dict["image_reader"] = image_reader
 
+
+#widgets creations end
+
+
+#functions
     def open_image(self):
         #this function opens the image that the user wants to predict
 
